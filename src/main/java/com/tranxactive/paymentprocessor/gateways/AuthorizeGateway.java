@@ -23,11 +23,11 @@ import org.bson.Document;
 public class AuthorizeGateway extends Gateway {
 
     @Override
-    public HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard) {
+    public HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, float amount) {
         Document document;
         String result;
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), this.buildPurchaseParameters(apiParameters, customer, customerCard).toJson(), ContentType.APPLICATION_JSON);
+            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), this.buildPurchaseParameters(apiParameters, customer, customerCard, amount).toJson(), ContentType.APPLICATION_JSON);
             document = Document.parse(httpResponse.getContent());
             result = ((Document) document.get("messages")).getString("resultCode");
             if (!result.equalsIgnoreCase("ok")) {
@@ -110,7 +110,7 @@ public class AuthorizeGateway extends Gateway {
     @Override
     public Document getRefundSampleParameters() {
         return new Document()
-                .append("refTransId", "the last successfull transaction id")
+                .append("refTransId", "the transaction id which will be refunded")
                 .append("cardNumber", "last 4 digits of card")
                 .append("expiryMonth", "must be 2 digits expiry month of card i.e for jan 01")
                 .append("expiryYear", "must be 4 digits expiry year of card i.e 2017");
@@ -130,7 +130,7 @@ public class AuthorizeGateway extends Gateway {
     }
 
     //private methods are starting below.
-    private Document buildPurchaseParameters(Document apiParameters, Customer customer, CustomerCard customerCard) {
+    private Document buildPurchaseParameters(Document apiParameters, Customer customer, CustomerCard customerCard, float amount) {
 
         Document document = new Document();
         document
@@ -138,7 +138,7 @@ public class AuthorizeGateway extends Gateway {
                         .append("merchantAuthentication", apiParameters)
                         .append("transactionRequest", new Document()
                                 .append("transactionType", "authCaptureTransaction")
-                                .append("amount", Float.toString(customerCard.getAmout()))
+                                .append("amount", Float.toString(amount))
                                 .append("payment", new Document()
                                         .append("creditCard", new Document()
                                                 .append("cardNumber", customerCard.getNumber())

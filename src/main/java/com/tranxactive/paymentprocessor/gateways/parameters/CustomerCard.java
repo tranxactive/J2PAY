@@ -17,7 +17,6 @@ public class CustomerCard {
     private String expiryMonth;
     private String expiryYear;
     private Currency currency;
-    private float amout;
 
     /**
      * @return the name
@@ -101,22 +100,6 @@ public class CustomerCard {
     }
 
     /**
-     * @return the amout
-     */
-    public float getAmout() {
-        return amout;
-    }
-
-    /**
-     * @param amout the amout to set
-     * @return this class object for chaining
-     */
-    public CustomerCard setAmout(float amout) {
-        this.amout = amout;
-        return this;
-    }
-
-    /**
      * @return the currency
      */
     public Currency getCurrency() {
@@ -142,7 +125,6 @@ public class CustomerCard {
         this.setCvv(123);
         this.setExpiryMonth("12");
         this.setExpiryYear("2017");
-        this.setAmout(2.24f);
         this.setCurrency(Currency.USD);
 
         return this;
