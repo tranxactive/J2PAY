@@ -16,7 +16,6 @@ public class CustomerCard {
     private int cvv;
     private String expiryMonth;
     private String expiryYear;
-    private Currency currency;
 
     /**
      * @return the name
@@ -100,20 +99,6 @@ public class CustomerCard {
     }
 
     /**
-     * @return the currency
-     */
-    public Currency getCurrency() {
-        return currency;
-    }
-
-    /**
-     * @param currency the currency to set
-     */
-    public void setCurrency(Currency currency) {
-        this.currency = currency;
-    }
-
-    /**
      * This method populates test values for this customer. Use this method for
      * test purpose only.
      *
@@ -125,7 +110,6 @@ public class CustomerCard {
         this.setCvv(123);
         this.setExpiryMonth("12");
         this.setExpiryYear("2017");
-        this.setCurrency(Currency.USD);
 
         return this;
     }

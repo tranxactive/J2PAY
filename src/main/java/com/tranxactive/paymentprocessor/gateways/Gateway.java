@@ -5,6 +5,7 @@
  */
 package com.tranxactive.paymentprocessor.gateways;
 
+import com.tranxactive.paymentprocessor.gateways.parameters.Currency;
 import com.tranxactive.paymentprocessor.gateways.parameters.Customer;
 import com.tranxactive.paymentprocessor.gateways.parameters.CustomerCard;
 import com.tranxactive.paymentprocessor.net.HTTPResponse;
@@ -31,8 +32,9 @@ public abstract class Gateway implements GatewaySampleParameters {
      * after populating values.<br>
      * @param customer the Customer information. i.e. first name, last name ,
      * zip.<br>
-     * @param customerCard the Customer credit card info like card number cvv.
+     * @param customerCard the Customer credit card info like card number, cvv.
      * currency in which card will be charged and amount which will be charged.
+     * @param currency the currency in which amount will be charged.
      * @param amount the amount which will be charged.
      * @return the HTTPResponse class.
      *
@@ -42,7 +44,7 @@ public abstract class Gateway implements GatewaySampleParameters {
      * @see HTTPResponse
      *
      */
-    public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, float amount);
+    public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
 
     /**
      * This method is used to refund the previously captured amount

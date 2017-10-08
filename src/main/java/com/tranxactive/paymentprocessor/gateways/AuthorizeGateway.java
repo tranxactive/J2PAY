@@ -5,6 +5,7 @@
  */
 package com.tranxactive.paymentprocessor.gateways;
 
+import com.tranxactive.paymentprocessor.gateways.parameters.Currency;
 import com.tranxactive.paymentprocessor.gateways.parameters.Customer;
 import com.tranxactive.paymentprocessor.gateways.parameters.CustomerCard;
 import com.tranxactive.paymentprocessor.net.HTTPClient;
@@ -23,11 +24,11 @@ import org.bson.Document;
 public class AuthorizeGateway extends Gateway {
 
     @Override
-    public HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, float amount) {
+    public HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
         Document document;
         String result;
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), this.buildPurchaseParameters(apiParameters, customer, customerCard, amount).toJson(), ContentType.APPLICATION_JSON);
+            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount).toJson(), ContentType.APPLICATION_JSON);
             document = Document.parse(httpResponse.getContent());
             result = ((Document) document.get("messages")).getString("resultCode");
             if (!result.equalsIgnoreCase("ok")) {
@@ -130,7 +131,7 @@ public class AuthorizeGateway extends Gateway {
     }
 
     //private methods are starting below.
-    private Document buildPurchaseParameters(Document apiParameters, Customer customer, CustomerCard customerCard, float amount) {
+    private Document buildPurchaseParameters(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
         Document document = new Document();
         document
