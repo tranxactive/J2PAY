@@ -58,7 +58,7 @@ Now we can call purchase, refund, void and rebill methods.
 
 Purchase method required 5 parameters.
 
-* Document apiParamters, that is the gateway specif paramters always unique for each gateway. 
+* Document apiParamters, that is the gateway specific paramters always unique for each gateway. 
 * Customer customer, this class represents customer personal information.
 * CustomerCard customerCard, this class represents the Customer card details.
 * Currency currency, that is enum contains the list of currecny in which amount will be charged.
@@ -136,7 +136,7 @@ response.isSuccessful();
 response.getContent();
 ```
 
-# Putting all code togather.
+# Putting all code together.
 
 ```java
 Gateway gateway = GatewayFactory.getGateway(AvailableGateways.AUTHORIZE);
@@ -165,6 +165,8 @@ customerCard
         .setExpiryMonth("01")
         .setExpiryYear("2022");
         
+gateway.setTestMode(true);
+
 HTTPResponse response = gateway.purchase(apiSampleParameters, customer, customerCard, Currency.USD, 45);
 
 System.out.println(response.isSuccessful());
