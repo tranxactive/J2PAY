@@ -174,6 +174,43 @@ System.out.println(response.getContent());
 
 ```
 
+# Contributors
+
+We are very excited to welcome contributers, If you have worked on any gateway you can implement that gateway in our library and support the opensource world.
+
+**Example**
+
+You can create new gateway by inheriting gateway class.
+
+Here is the list of methods you must ovverride.
+
+* public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
+* public abstract HTTPResponse refund(Document apiParameters, Document refundParameters, float amount);
+* public abstract HTTPResponse rebill(Document apiParameters, Document rebillParameters, float amount);
+* public abstract HTTPResponse voidTransaction(Document apiParameters, Document voidParameters);
+
+Since gateway class in implementing GatewaySampleParameters you must override its methods too.
+
+* public abstract Document getApiSampleParameters();
+* public abstract Document getRefundSampleParameters();
+* public abstract Document getRebillSampleParameters();
+* public abstract Document getVoidSampleParameters();
+
+**Making http requests**
+
+This library comes with built-in http client which itself is a wrapper of apache http client.
+
+HTTPClient class has two static methods.
+
+* httpGet(String url)
+* httpPost(String url, String postParams, ContentType contentType, Charset charset)
+
+you can use them directly without worring about http requests.
+
+**Handling http response**
+
+This library has a built-in class to handle http response which is HTTPResponse.
+As you can see above all gateway methods are returning this class object instead of plain text or json.
 
 
 
