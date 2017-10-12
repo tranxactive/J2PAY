@@ -229,7 +229,7 @@ Document document = Document.parse(httpResponse.getContent());
 
 After you have integreated your gateway successfully, dont forget to make it available in,
 
-* gatewayFactory class and '
+* gatewayFactory class and
 * AvailableGateways enum
 
 **`It is highly recommended to check the source code of already integrated gateway before implementing your gateway`**
