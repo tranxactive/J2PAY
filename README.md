@@ -67,7 +67,7 @@ Purchase method required 5 parameters.
 * Document apiParamters, that is the gateway specific paramters always unique for each gateway. 
 * Customer customer, this class represents customer personal information.
 * CustomerCard customerCard, this class represents the Customer card details.
-* Currency currency, that is enum contains the list of currecny in which amount will be charged.
+* Currency currency, that is enum contains the list of currency in which amount will be charged.
 * float amount, the amout that will be charged.
 
 **1st Parameter**
@@ -101,7 +101,7 @@ Customer class comes with chaining setter methods.
 Customer customer = new Customer();
         
 customer
-        .setFirstName("test lirst name")
+        .setFirstName("test first name")
         .setLastName("test last name")
         .setCountry(Country.US)
         .setState("TX")
@@ -125,7 +125,7 @@ customerCard
         .setExpiryYear("2022");
 ```
 
-4th and 5th parametres does not required any explanation.
+4th and 5th parameters does not required any explanation.
 
 now all parameters are ready we can pass them to purchase mehtod.
 before purchase you can enable the test mode by calling setTestMode of gateway, By default test mode is disabled.
@@ -188,7 +188,7 @@ We are very excited to welcome contributers, If you have worked on any gateway y
 
 You can create new gateway by inheriting gateway class.
 
-Here is the list of methods you must ovverride.
+Here is the list of methods you must override.
 
 * public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
 * public abstract HTTPResponse refund(Document apiParameters, Document refundParameters, float amount);
@@ -218,7 +218,7 @@ you can use them directly without worring about http requests.
 This library has a built-in class to handle http response which is HTTPResponse.
 As you can see above all gateway methods are returning this class object instead of plain text or json.
 
-After making http request dont forget to set response status by using setSuccessful(boolean successfull) method of HTTPResponse class.
+After making http request do not forget to set response status by using setSuccessful(boolean successful) method of HTTPResponse class.
 By default success is set to true but if you found some error in response you can change that otherwise no need to marke response as false.
 
 ```java
@@ -233,7 +233,7 @@ Document document = Document.parse(httpResponse.getContent());
 
 **Finalizing gateway**
 
-After you have integreated your gateway successfully, dont forget to make it available in,
+After you have integrated your gateway successfully, dont forget to make it available in,
 
 * gatewayFactory class and
 * AvailableGateways enum
