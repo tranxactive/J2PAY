@@ -178,7 +178,7 @@ System.out.println(response.getContent());
 
 We are very excited to welcome contributers, If you have worked on any gateway you can implement that gateway in our library and support the opensource world.
 
-**Example**
+**Integrating new Gateway**
 
 You can create new gateway by inheriting gateway class.
 
@@ -211,6 +211,33 @@ you can use them directly without worring about http requests.
 
 This library has a built-in class to handle http response which is HTTPResponse.
 As you can see above all gateway methods are returning this class object instead of plain text or json.
+
+After making http request dont forget to set response status by using setSuccessful(boolean successfull) method of HTTPResponse class.
+By default success is set to true but if you found some error in response you can change that otherwise no need to marke response as false.
+
+```java
+httpResponse.setSuccessful(false);
+```
+
+if api is returning json data you can easly parse that to Document class (Object based representation of json).
+
+```java
+Document document = Document.parse(httpResponse.getContent());
+```
+
+**Finalizing gateway**
+
+After you have integreated your gateway successfully, dont forget to make it available in,
+
+* gatewayFactory class and '
+* AvailableGateways enum
+
+**`It is highly recommended to check the source code of already integrated gateway before implementing your gateway`**
+
+**`GOOD LUCK`**
+
+
+ 
 
 
 
