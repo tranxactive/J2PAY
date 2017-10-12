@@ -4,6 +4,12 @@
 
 J2Pay is a payment processing library for Java.
 
+## Supported Gateways
+
+1. Authorize.net
+
+`newly intergrated gateways will be added in this list.`
+
 **Goals of this library**
 
 * Developer should be able to integrate any gateway without the need of reading documention of specific gateway.
