@@ -219,7 +219,7 @@ This library has a built-in class to handle http response which is HTTPResponse.
 As you can see above all gateway methods are returning this class object instead of plain text or json.
 
 After making http request do not forget to set response status by using setSuccessful(boolean successful) method of HTTPResponse class.
-By default success is set to true but if you found some error in response you can change that otherwise no need to marke response as false.
+By default success is set to true but if you found some error in response you can change that otherwise no need to mark response as false.
 
 ```java
 httpResponse.setSuccessful(false);
