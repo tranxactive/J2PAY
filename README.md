@@ -240,6 +240,10 @@ After you have integrated your gateway successfully, dont forget to make it avai
 
 **`It is highly recommended to check the source code of already integrated gateway before implementing your gateway`**
 
+# Contact us.
+
+Feel free to contact us at info@tranxactive.com.
+
 **`GOOD LUCK`**
 
 
