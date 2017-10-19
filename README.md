@@ -11,6 +11,8 @@ J2Pay is a payment processing library for Java.
 
 `newly intergrated gateways will be added in this list.`
 
+If your desired gateway is not in the list you can write us at info@tranxactive.com and we will try our best to integrate that gatway as soon as possible.
+
 **Goals of this library**
 
 * Developer should be able to integrate any gateway without the need of reading documention of specific gateway.
@@ -155,7 +157,7 @@ apiSampleParameters.replace("transactionKey", "<your account's transaction key h
 Customer customer = new Customer();
         
 customer
-        .setFirstName("test lirst name")
+        .setFirstName("test first name")
         .setLastName("test last name")
         .setCountry(Country.US)
         .setState("TX")
@@ -243,7 +245,7 @@ After you have integrated your gateway successfully, dont forget to make it avai
 
 # Contact us.
 
-Feel free to contact us at info@tranxactive.com.
+Feel free to contact or suggest us at info@tranxactive.com.
 
 **`GOOD LUCK`**
 
