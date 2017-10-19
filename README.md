@@ -18,7 +18,7 @@ If your desired gateway is not in the list you can write us at info@tranxactive.
 * Developer should be able to integrate any gateway without the need of reading documention of specific gateway.
 * Provide generic methods for all gateways.
 
-This library will be focusing only four major methods of gateways.
+This library will be focusing on four major methods of gateways.
 
 * Purchase
 * Refund
