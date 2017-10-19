@@ -11,6 +11,7 @@ package com.tranxactive.paymentprocessor.gateways;
  */
 public enum AvailableGateways {
 
-    AUTHORIZE;
+    AUTHORIZE,
+    NMI;
 
 }

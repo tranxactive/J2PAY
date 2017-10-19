@@ -19,6 +19,7 @@ public class Customer {
     private String zip;
     private Country country;
     private String phoneNumber;
+    private String email;
 
     /**
      * @return the firstName
@@ -149,6 +150,20 @@ public class Customer {
     }
 
     /**
+     * @return the email
+     */
+    public String getEmail() {
+        return email;
+    }
+
+    /**
+     * @param email the email to set
+     */
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    /**
      * This method populates test values for this customer. Use this method for
      * test purpose only.
      *
@@ -163,6 +178,7 @@ public class Customer {
         this.setZip("12345");
         this.setCountry(Country.US);
         this.setPhoneNumber("1254685478");
+        this.setEmail("testEmail@domain.com");
 
         return this;
     }

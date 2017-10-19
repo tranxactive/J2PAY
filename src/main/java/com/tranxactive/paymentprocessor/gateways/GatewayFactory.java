@@ -16,9 +16,11 @@ public class GatewayFactory {
         switch (availableGateways) {
             case AUTHORIZE:
                 return new AuthorizeGateway();
-        }
-
-        return null;
+            case NMI:
+                return new NMIGateway();                
+            default:
+                return null;
+        }        
     }
 
 }

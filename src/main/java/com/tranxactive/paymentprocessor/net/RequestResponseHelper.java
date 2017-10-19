@@ -8,6 +8,8 @@ package com.tranxactive.paymentprocessor.net;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.util.Map;
+import java.util.Set;
 import org.bson.Document;
 
 /**
@@ -21,13 +23,12 @@ public class RequestResponseHelper {
 
     /**
      * <p>
-     * This method converts json Document to application/x-www-form-urlencoded. Do
-     * not use this method to parse nested json.
+     * This method converts json Document to application/x-www-form-urlencoded.
+     * Do not use this method to parse nested json.
      * </p>
      * <b>example</b><br>
      * It converts the below json Object {key1:val1, key2:val2} to
-     * key1=val1&key2=v2 do not forget to encode parsed parameters using encode
-     * method of this class
+     * key1=val1&key2=v2
      *
      * @param document Document Object
      * @return application/x-www-form-urlencoded representation of JsonObject
@@ -48,24 +49,66 @@ public class RequestResponseHelper {
     }
 
     /**
+     * This method converts queryString to json Document.
+     *
+     * @param queryString the query string that nedd to be parsed
+     * @return Document object the json representation of data
+     */
+    public static Document toJson(String queryString) {
+
+        String[] params = queryString.split("&");
+        Document document = new Document();
+
+        for (String param : params) {
+            String[] p = param.split("=");
+            String name = p[0];
+            if (p.length > 1) {
+                String value = p[1];
+                document.append(name, value);
+            }
+        }
+
+        return document;
+
+    }
+
+    /**
      * This method encodes String into application/x-www-form-urlencoded.
      *
-     * @param params string to be encoded
-     * @return encoded String
+     * @param params Document to be encoded
+     * @return encoded Document
      * @throws java.io.UnsupportedEncodingException in case if encode failed
      */
-    public static String encode(String params) throws UnsupportedEncodingException {
-        return URLEncoder.encode(params, "UTF-8");
+    public static Document encode(Document params) throws UnsupportedEncodingException {
+
+        Document finalDocument = new Document();
+
+        Set<Map.Entry<String, Object>> entrySet = params.entrySet();
+
+        for (Map.Entry<String, Object> entry : entrySet) {
+            finalDocument.append(entry.getKey(), entry.getValue() instanceof Document ? encode((Document) entry.getValue()) : URLEncoder.encode(String.valueOf(entry.getValue()), "UTF-8"));
+        }
+
+        return finalDocument;
     }
 
     /**
      * This method decodes String into application/x-www-form-urlencoded.
      *
-     * @param params string to be decoded
-     * @return decoded String
+     * @param params Document to be decoded
+     * @return decoded Document
      * @throws java.io.UnsupportedEncodingException in case if decode failed
      */
-    public static String decode(String params) throws UnsupportedEncodingException {
-        return URLDecoder.decode(params, "UTF-8");
+    public static Document decode(Document params) throws UnsupportedEncodingException {
+
+        Document finalDocument = new Document();
+
+        Set<Map.Entry<String, Object>> entrySet = params.entrySet();
+
+        for (Map.Entry<String, Object> entry : entrySet) {
+            finalDocument.append(entry.getKey(), entry.getValue() instanceof Document ? decode((Document) entry.getValue()) : URLDecoder.decode((String) entry.getValue(), "UTF-8"));
+        }
+
+        return finalDocument;
     }
 }
