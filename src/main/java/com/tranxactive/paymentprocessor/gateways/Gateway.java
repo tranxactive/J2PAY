@@ -9,7 +9,7 @@ import com.tranxactive.paymentprocessor.gateways.parameters.Currency;
 import com.tranxactive.paymentprocessor.gateways.parameters.Customer;
 import com.tranxactive.paymentprocessor.gateways.parameters.CustomerCard;
 import com.tranxactive.paymentprocessor.net.HTTPResponse;
-import org.bson.Document;
+import org.json.JSONObject;
 
 /**
  *
@@ -38,13 +38,13 @@ public abstract class Gateway implements GatewaySampleParameters {
      * @param amount the amount which will be charged.
      * @return the HTTPResponse class.
      *
-     * @see Document
+     * @see JSONObject
      * @see Customer
      * @see CustomerCard
      * @see HTTPResponse
      *
      */
-    public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
+    public abstract HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
 
     /**
      * This method is used to refund the previously captured amount
@@ -61,11 +61,11 @@ public abstract class Gateway implements GatewaySampleParameters {
      *
      * @return the HTTPResponse class.
      *
-     * @see Document
+     * @see JSONObject
      * @see HTTPResponse
      *
      */
-    public abstract HTTPResponse refund(Document apiParameters, Document refundParameters, float amount);
+    public abstract HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount);
 
     /**
      * This method is used to rebill the previously charged transaction.
@@ -83,10 +83,10 @@ public abstract class Gateway implements GatewaySampleParameters {
      *
      * @return the HTTPResponse class.
      *
-     * @see Document
+     * @see JSONObject
      * @see HTTPResponse
      */
-    public abstract HTTPResponse rebill(Document apiParameters, Document rebillParameters, float amount);
+    public abstract HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount);
 
     /**
      * This method is used to cancel the transaction that is not yet
@@ -101,14 +101,14 @@ public abstract class Gateway implements GatewaySampleParameters {
      * same object after populating values.<br>
      * @return the HTTPResponse class
      *
-     * @see Document
+     * @see JSONObject
      * @see HTTPResponse
      */
-    public abstract HTTPResponse voidTransaction(Document apiParameters, Document voidParameters);
+    public abstract HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters);
 
     /**
      * This method is used to check the test mode status.
-     * 
+     *
      * @return the testMode
      */
     public boolean isTestMode() {
@@ -116,9 +116,11 @@ public abstract class Gateway implements GatewaySampleParameters {
     }
 
     /**
-     * To enable test mode. By default test mode is disabled
+     * To enable test mode. By default test mode is disabled most of the
+     * gateways do not support test mode so this method will have no effect on
+     * that gateways.
      *
-     * @param testMode the testMode to set
+     * @param testMode if true is passed test mode will be activated.
      */
     public void setTestMode(boolean testMode) {
         this.testMode = testMode;

@@ -40,7 +40,7 @@ Here is the list of some major classes you must know before starting working on 
 * Gateway, is the top level abstract class all gateways must be inheriting this class.
 * GatewayFactory, will be responsible for returning the required gateway.
 * HTTPResponse, gateway reponse will be returning this class's object instead of plain text or json.
-* Document, Represent the json data. also will be using for posting dynamic gateway data.
+* JSONObject, Represent the json data. also will be using for posting dynamic gateway data.
 * AvailableGateways, enum contains the list of supported gateways. we will be passing this to GatewayFactory to get the desired gateway class object.
 
 # Example
@@ -67,7 +67,7 @@ Now we can call purchase, refund, void and rebill methods.
 
 Purchase method required 5 parameters.
 
-* Document apiParamters, that is the gateway specific paramters always unique for each gateway. 
+* JSONObject apiParamters, that is the gateway specific paramters always unique for each gateway. 
 * Customer customer, this class represents customer personal information.
 * CustomerCard customerCard, this class represents the Customer card details.
 * Currency currency, that is enum contains the list of currency in which amount will be charged.
@@ -78,7 +78,7 @@ Purchase method required 5 parameters.
 lets get the apiSampleParameters by calling getApiSampleParameters() method.
 
 ```java
-Document apiSampleParameters = gateway.getApiSampleParameters();
+JSONObject apiSampleParameters = gateway.getApiSampleParameters();
 ```
 we will print apiSampleParameters to see what is the requirement.
 
@@ -92,8 +92,8 @@ As you can see for Authorize api parameters are name and transactionKey.
 We will populate these values and pass to purchase method.
 
 ```java
-apiSampleParameters.replace("name", "<your acount's use name here>");
-apiSampleParameters.replace("transactionKey", "<your account's transaction key here>");
+apiSampleParameters.put("name", "<your acount's use name here>");
+apiSampleParameters.put("transactionKey", "<your account's transaction key here>");
 ```
 
 **2nd Parameter**
@@ -149,10 +149,10 @@ response.getContent();
 
 ```java
 Gateway gateway = GatewayFactory.getGateway(AvailableGateways.AUTHORIZE);
-Document apiSampleParameters = gateway.getApiSampleParameters();
+JSONObject apiSampleParameters = gateway.getApiSampleParameters();
 
-apiSampleParameters.replace("name", "<your acount's use name here>");
-apiSampleParameters.replace("transactionKey", "<your account's transaction key here>");
+apiSampleParameters.put("name", "<your acount's use name here>");
+apiSampleParameters.put("transactionKey", "<your account's transaction key here>");
 
 Customer customer = new Customer();
         
@@ -193,17 +193,17 @@ You can create new gateway by inheriting gateway class.
 
 Here is the list of methods you must override.
 
-* public abstract HTTPResponse purchase(Document apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
-* public abstract HTTPResponse refund(Document apiParameters, Document refundParameters, float amount);
-* public abstract HTTPResponse rebill(Document apiParameters, Document rebillParameters, float amount);
-* public abstract HTTPResponse voidTransaction(Document apiParameters, Document voidParameters);
+* public abstract HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
+* public abstract HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount);
+* public abstract HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount);
+* public abstract HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters);
 
 Since gateway class in implementing GatewaySampleParameters you must override its methods too.
 
-* public abstract Document getApiSampleParameters();
-* public abstract Document getRefundSampleParameters();
-* public abstract Document getRebillSampleParameters();
-* public abstract Document getVoidSampleParameters();
+* public abstract JSONObject getApiSampleParameters();
+* public abstract JSONObject getRefundSampleParameters();
+* public abstract JSONObject getRebillSampleParameters();
+* public abstract JSONObject getVoidSampleParameters();
 
 **Making http requests**
 
@@ -226,12 +226,6 @@ By default success is set to true but if you found some errors in response you c
 
 ```java
 httpResponse.setSuccessful(false);
-```
-
-if api is returning json data you can easly parse that to Document class (Object based representation of json).
-
-```java
-Document document = Document.parse(httpResponse.getContent());
 ```
 
 **Finalizing gateway**

@@ -5,7 +5,7 @@
  */
 package com.tranxactive.paymentprocessor.gateways;
 
-import org.bson.Document;
+import org.json.JSONObject;
 
 /**
  *
@@ -20,11 +20,11 @@ interface GatewaySampleParameters {
      * @return the sample API parameters required in all kind of merchant
      * interaction.
      */
-    public abstract Document getApiSampleParameters();
+    public abstract JSONObject getApiSampleParameters();
 
-    public abstract Document getRefundSampleParameters();
+    public abstract JSONObject getRefundSampleParameters();
 
-    public abstract Document getRebillSampleParameters();
+    public abstract JSONObject getRebillSampleParameters();
 
-    public abstract Document getVoidSampleParameters();
+    public abstract JSONObject getVoidSampleParameters();
 }

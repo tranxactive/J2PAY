@@ -23,7 +23,7 @@ import org.apache.http.util.EntityUtils;
 public class HTTPClient {
 
     /**
-     * This method is the wrapper of apache http cleint get request.
+     * This method is the wrapper of apache http client get request.
      *
      * @param url The url to hit request with/without get parameters i.e
      * http://127.0.0.1/index.php?param1=val1&param2=val2
@@ -49,7 +49,7 @@ public class HTTPClient {
     }
 
     /**
-     * This method is the wrapper of apache http cleint post request.
+     * This method is the wrapper of apache http client post request.
      *
      * @param url The url on which the request will be hit.
      * @param postParams parameters which will be passed for post.
@@ -87,7 +87,7 @@ public class HTTPClient {
     }
     
     /**
-     * This method is the wrapper of apache http cleint post request.
+     * This method is the wrapper of apache http client post request.
      *
      * @param url The url on which the request will be hit.
      * @param postParams parameters which will be passed for post.
