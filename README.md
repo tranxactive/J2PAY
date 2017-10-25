@@ -214,7 +214,7 @@ HTTPClient class has two static methods.
 * httpGet(String url)
 * httpPost(String url, String postParams, ContentType contentType, Charset charset)
 
-you can use them directly without worring about http requests.
+you can use them directly without worrying about http requests.
 
 **Handling http response**
 
