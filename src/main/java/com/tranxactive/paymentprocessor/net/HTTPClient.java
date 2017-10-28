@@ -80,6 +80,7 @@ public class HTTPClient {
             endTime = System.currentTimeMillis();
             
             hTTPResponse = new HTTPResponse(closeableHttpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(closeableHttpResponse.getEntity()).replaceFirst("^\uFEFF", ""), endTime - startTime);
+            hTTPResponse.setRequestString(postParams);
             EntityUtils.consume(closeableHttpResponse.getEntity());
         }
         return hTTPResponse;

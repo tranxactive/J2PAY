@@ -113,4 +113,41 @@ public class CustomerCard {
 
         return this;
     }
+    
+    /**
+     *
+     * @return first 6 digits of card.
+     */
+    public String getFirst6(){
+        
+        return this.getNumber().substring(0, 6);
+    }
+    
+    /**
+     *
+     * @return last 4 digits of card.
+     */
+    public String getLast4(){
+        
+        return this.getNumber().substring(this.getNumber().length() - 4, this.getNumber().length());
+    }
+    
+    /**
+     *
+     * @return masked card number
+     */
+    public String getMaskedCard(){
+        
+        StringBuilder maskedCard = new StringBuilder();
+        maskedCard.append(this.getFirst6());
+        
+        for (int i = 0; i < this.getNumber().length()-10; i++) {
+            maskedCard.append("*");
+        }
+        
+        maskedCard.append(this.getLast4());
+        
+        return maskedCard.toString();
+        
+    }
 }
