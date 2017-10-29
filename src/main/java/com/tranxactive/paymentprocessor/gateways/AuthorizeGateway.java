@@ -16,6 +16,7 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.entity.ContentType;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -47,6 +48,8 @@ public class AuthorizeGateway extends Gateway {
                     lr.put("cardFirst6", customerCard.getFirst6());
                     lr.put("cardLast4", customerCard.getLast4());
                     lr.put("maskedCard", customerCard.getMaskedCard());
+                    lr.put("cardExpiryMonth", customerCard.getExpiryMonth());
+                    lr.put("cardExpiryYear", customerCard.getExpiryYear());
 
                     if (response.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").has("customerProfileId")) {
                         lr.put("customerProfileId", response.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").get("customerProfileId").toString());
@@ -56,12 +59,16 @@ public class AuthorizeGateway extends Gateway {
                 } else {
                     httpResponse.setSuccessful(false);
                     lr.put("success", false);
-                    lr.put("errorText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    } else {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    }
                 }
             } else {
                 httpResponse.setSuccessful(false);
                 lr.put("success", false);
-                lr.put("errorText", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
 
             finalResponse.put("lr", lr);
@@ -100,12 +107,16 @@ public class AuthorizeGateway extends Gateway {
                 } else {
                     httpResponse.setSuccessful(false);
                     lr.put("success", false);
-                    lr.put("errorText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    } else {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    }
                 }
             } else {
                 httpResponse.setSuccessful(false);
                 lr.put("success", false);
-                lr.put("errorText", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
 
             finalResponse.put("lr", lr);
@@ -145,12 +156,12 @@ public class AuthorizeGateway extends Gateway {
                 } else {
                     httpResponse.setSuccessful(false);
                     lr.put("success", false);
-                    lr.put("errorText", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
                 }
             } else {
                 httpResponse.setSuccessful(false);
                 lr.put("success", false);
-                lr.put("errorText", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
 
             finalResponse.put("lr", lr);
@@ -189,12 +200,16 @@ public class AuthorizeGateway extends Gateway {
                 } else {
                     httpResponse.setSuccessful(false);
                     lr.put("success", false);
-                    lr.put("errorText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                    } else {
+                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    }
                 }
             } else {
                 httpResponse.setSuccessful(false);
                 lr.put("success", false);
-                lr.put("errorText", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
 
             finalResponse.put("lr", lr);
