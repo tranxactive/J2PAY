@@ -16,7 +16,6 @@ import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.apache.http.entity.ContentType;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
@@ -44,7 +43,7 @@ public class AuthorizeGateway extends Gateway {
                 if (result.equalsIgnoreCase("ok")) {
                     lr.put("success", true);
                     lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                    lr.put("infoText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
                     lr.put("cardFirst6", customerCard.getFirst6());
                     lr.put("cardLast4", customerCard.getLast4());
                     lr.put("maskedCard", customerCard.getMaskedCard());
@@ -102,7 +101,7 @@ public class AuthorizeGateway extends Gateway {
                 if (result.equalsIgnoreCase("ok")) {
                     lr.put("success", true);
                     lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                    lr.put("infoText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
 
                 } else {
                     httpResponse.setSuccessful(false);
@@ -151,7 +150,7 @@ public class AuthorizeGateway extends Gateway {
                 if (result.equalsIgnoreCase("ok")) {
                     lr.put("success", true);
                     lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                    lr.put("infoText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
 
                 } else {
                     httpResponse.setSuccessful(false);
@@ -195,7 +194,7 @@ public class AuthorizeGateway extends Gateway {
                 if (result.equalsIgnoreCase("ok")) {
                     lr.put("success", true);
                     lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                    lr.put("infoText", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
 
                 } else {
                     httpResponse.setSuccessful(false);
