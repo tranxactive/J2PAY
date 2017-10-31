@@ -33,25 +33,42 @@ public class NMIGateway extends Gateway {
         JSONObject responseObject;
         String requestString;
         String responseString;
-
+        int responseCode;
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
+        HTTPResponse httpResponse;
+        JSONObject lr = new JSONObject();
 
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
-            responseString = httpResponse.getContent();
-            responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-            httpResponse.setContent(responseObject.toString());
-
-            if (!responseObject.getString("response_code").equals("100")) {
-                httpResponse.setSuccessful(false);
-            }
-
-            return httpResponse;
+            httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
         } catch (IOException ex) {
             Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        return null;
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseCode = responseObject.getInt("response_code");
+
+        if (responseCode == 100) {
+            lr.put("success", true);
+            lr.put("transactionId", responseObject.get("transactionid").toString());
+            lr.put("message", responseObject.getString("responsetext"));
+            lr.put("cardFirst6", customerCard.getFirst6());
+            lr.put("cardLast4", customerCard.getLast4());
+            lr.put("maskedCard", customerCard.getMaskedCard());
+            lr.put("cardExpiryMonth", customerCard.getExpiryMonth());
+            lr.put("cardExpiryYear", customerCard.getExpiryYear());
+            lr.put("customerVaultId", responseObject.get("customer_vault_id").toString());
+        } else {
+            httpResponse.setSuccessful(false);
+            lr.put("success", false);
+            lr.put("message", responseObject.getString("responsetext"));
+        }
+
+        httpResponse.setContent(new JSONObject().put("lr", lr).put("gr", responseObject).toString());
+        return httpResponse;
+
     }
 
     @Override
@@ -65,21 +82,34 @@ public class NMIGateway extends Gateway {
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
 
+        HTTPResponse httpResponse;
+        JSONObject lr = new JSONObject();
+        int responseCode;
+
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
-            responseString = httpResponse.getContent();
-            responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-            httpResponse.setContent(responseObject.toString());
-
-            if (!responseObject.getString("response_code").equals("100")) {
-                httpResponse.setSuccessful(false);
-            }
-
-            return httpResponse;
+            httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
         } catch (IOException ex) {
             Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        return null;
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseCode = responseObject.getInt("response_code");
+
+        if (responseCode == 100) {
+            lr.put("success", true);
+            lr.put("transactionId", responseObject.get("transactionid").toString());
+            lr.put("message", responseObject.getString("responsetext"));
+        } else {
+            httpResponse.setSuccessful(false);
+            lr.put("success", false);
+            lr.put("message", responseObject.getString("responsetext"));
+        }
+
+        httpResponse.setContent(new JSONObject().put("lr", lr).put("gr", responseObject).toString());
+        return httpResponse;
+
     }
 
     @Override
@@ -93,21 +123,33 @@ public class NMIGateway extends Gateway {
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
 
+        HTTPResponse httpResponse;
+        JSONObject lr = new JSONObject();
+        int responseCode;
+
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
-            responseString = httpResponse.getContent();
-            responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-            httpResponse.setContent(responseObject.toString());
-
-            if (!responseObject.getString("response_code").equals("100")) {
-                httpResponse.setSuccessful(false);
-            }
-
-            return httpResponse;
+            httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
         } catch (IOException ex) {
             Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        return null;
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseCode = responseObject.getInt("response_code");
+
+        if (responseCode == 100) {
+            lr.put("success", true);
+            lr.put("transactionId", responseObject.get("transactionid").toString());
+            lr.put("message", responseObject.getString("responsetext"));
+        } else {
+            httpResponse.setSuccessful(false);
+            lr.put("success", false);
+            lr.put("message", responseObject.getString("responsetext"));
+        }
+
+        httpResponse.setContent(new JSONObject().put("lr", lr).put("gr", responseObject).toString());
+        return httpResponse;
     }
 
     @Override
@@ -121,21 +163,33 @@ public class NMIGateway extends Gateway {
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
 
+        HTTPResponse httpResponse;
+        JSONObject lr = new JSONObject();
+        int responseCode;
+
         try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
-            responseString = httpResponse.getContent();
-            responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-            httpResponse.setContent(responseObject.toString());
-
-            if (!responseObject.getString("response_code").equals("100")) {
-                httpResponse.setSuccessful(false);
-            }
-
-            return httpResponse;
+            httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
         } catch (IOException ex) {
             Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+            return null;
         }
-        return null;
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseCode = responseObject.getInt("response_code");
+
+        if (responseCode == 100) {
+            lr.put("success", true);
+            lr.put("transactionId", responseObject.get("transactionid").toString());
+            lr.put("message", responseObject.getString("responsetext"));
+        } else {
+            httpResponse.setSuccessful(false);
+            lr.put("success", false);
+            lr.put("message", responseObject.getString("responsetext"));
+        }
+
+        httpResponse.setContent(new JSONObject().put("lr", lr).put("gr", responseObject).toString());
+        return httpResponse;
     }
 
     @Override
@@ -154,7 +208,7 @@ public class NMIGateway extends Gateway {
     @Override
     public JSONObject getRebillSampleParameters() {
         return new JSONObject()
-                .put("customer_vault_id", "the customer vault id");
+                .put("customerVaultId", "the customer vault id");
     }
 
     @Override
@@ -175,6 +229,7 @@ public class NMIGateway extends Gateway {
                 .put("ccexp", customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
                 .put("cvv", customerCard.getCvv())
                 .put("amount", amount)
+                .put("currency", currency)
                 .put("first_name", customer.getFirstName())
                 .put("last_name", customer.getLastName())
                 .put("address1", customer.getAddress())
@@ -221,7 +276,7 @@ public class NMIGateway extends Gateway {
         object
                 .put("username", apiParameters.getString("username"))
                 .put("password", apiParameters.getString("password"))
-                .put("customer_vault_id", rebillParameters.getString("customer_vault_id"))
+                .put("customer_vault_id", rebillParameters.getString("customerVaultId"))
                 .put("amount", Float.toString(amount));
 
         return object;
