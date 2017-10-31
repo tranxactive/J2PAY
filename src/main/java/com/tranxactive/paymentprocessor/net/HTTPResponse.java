@@ -14,6 +14,7 @@ public class HTTPResponse {
 
     private int statusCode;
     private String content;
+    private String requestString;
 
     private long responseTime;
 
@@ -97,6 +98,20 @@ public class HTTPResponse {
      */
     public void setSuccessful(boolean successfull) {
         this.successfull = successfull;
+    }
+
+    /**
+     * @return the requestString
+     */
+    public String getRequestString() {
+        return requestString;
+    }
+
+    /**
+     * @param requestString the requestString to set
+     */
+    public void setRequestString(String requestString) {
+        this.requestString = requestString;
     }
 
 }

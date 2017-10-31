@@ -20,6 +20,7 @@ public class Customer {
     private Country country;
     private String phoneNumber;
     private String email;
+    private String ip;
 
     /**
      * @return the firstName
@@ -158,9 +159,27 @@ public class Customer {
 
     /**
      * @param email the email to set
+     * @return this class Object for chaining
      */
-    public void setEmail(String email) {
+    public Customer setEmail(String email) {
         this.email = email;
+        return this;
+    }
+    
+    /**
+     * @return the ip
+     */
+    public String getIp() {
+        return ip;
+    }
+
+    /**
+     * @param ip the ip to set
+     * @return this class Object for chaining
+     */
+    public Customer setIp(String ip) {
+        this.ip = ip;
+        return this;
     }
 
     /**
@@ -179,6 +198,7 @@ public class Customer {
         this.setCountry(Country.US);
         this.setPhoneNumber("1254685478");
         this.setEmail("testEmail@domain.com");
+        this.setIp("127.0.0.1");
 
         return this;
     }
