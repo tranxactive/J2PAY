@@ -239,6 +239,7 @@ public class NMIGateway extends Gateway {
                 .put("country", customer.getCountry().getCodeAlpha2())
                 .put("phone", customer.getPhoneNumber())
                 .put("email", customer.getEmail())
+                .put("ipaddress", customer.getIp())
                 .put("customer_vault", "add_customer");
 
         return object;
