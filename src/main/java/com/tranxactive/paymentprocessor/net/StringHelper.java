@@ -13,7 +13,7 @@ import java.util.logging.Logger;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class StringHelper {
     

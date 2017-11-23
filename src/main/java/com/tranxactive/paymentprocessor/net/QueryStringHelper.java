@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class QueryStringHelper {
 
@@ -21,7 +21,7 @@ public class QueryStringHelper {
      * </p>
      * <b>example</b><br>
      * It converts the below JSONObject {key1:val1, key2:val2} to
-     * key1=val1&key2=v2
+     * key1=val1&amp;key2=v2
      *
      * @param object the JSONObject that need to be parsed.
      * @return query string representation of JSONObject

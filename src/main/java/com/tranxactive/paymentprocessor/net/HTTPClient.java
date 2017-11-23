@@ -18,7 +18,7 @@ import org.apache.http.util.EntityUtils;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class HTTPClient {
 
@@ -26,9 +26,9 @@ public class HTTPClient {
      * This method is the wrapper of apache http client get request.
      *
      * @param url The url to hit request with/without get parameters i.e
-     * http://127.0.0.1/index.php?param1=val1&param2=val2
+     * http://127.0.0.1/index.php?param1=val1&amp;param2=val2
      * @return The HTTPResponse
-     * @throws java.io.IOException
+     * @throws java.io.IOException in case of any failure to communicating the server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      */
     public static HTTPResponse httpGet(String url) throws IOException {
@@ -56,7 +56,7 @@ public class HTTPClient {
      * @param contentType content-type in which data will be posted.
      * @param charset the charset in which request will be posted if null is provided contentType charset will be used.
      * @return The HTTPResponse class.
-     * @throws java.io.IOException
+     * @throws java.io.IOException in case of any failure to communicating the server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      * @see ContentType
      */
@@ -94,7 +94,7 @@ public class HTTPClient {
      * @param postParams parameters which will be passed for post.
      * @param contentType content-type in which data will be posted.
      * @return The HTTPResponse class.
-     * @throws java.io.IOException
+     * @throws java.io.IOException in case of any failure to communicating the server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      * @see ContentType
      */

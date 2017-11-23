@@ -7,7 +7,7 @@ package com.tranxactive.paymentprocessor.gateways;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public enum AvailableGateways {
 

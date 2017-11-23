@@ -45,6 +45,16 @@ Here is the list of some major classes you must know before starting working on 
 
 # Example
 
+If you are using maven you can add dependency.
+
+```xml
+<dependency>
+    <groupId>com.tranxactive</groupId>
+    <artifactId>j2pay</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 In this example we will be looking at purchase method.
 
 Before moving forword we must understand that some paramters are always different for each gateways.

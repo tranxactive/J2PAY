@@ -10,7 +10,7 @@ import org.json.XML;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class XMLHelper {
 
