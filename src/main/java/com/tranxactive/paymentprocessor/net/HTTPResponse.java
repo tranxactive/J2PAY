@@ -8,7 +8,7 @@ package com.tranxactive.paymentprocessor.net;
 /**
  * This class provides simplest handling of http response.
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class HTTPResponse {
 

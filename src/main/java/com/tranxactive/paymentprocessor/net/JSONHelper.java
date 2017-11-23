@@ -16,7 +16,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class JSONHelper {
 

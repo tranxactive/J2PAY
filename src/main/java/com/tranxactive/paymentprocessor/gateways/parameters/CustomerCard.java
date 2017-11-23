@@ -7,7 +7,7 @@ package com.tranxactive.paymentprocessor.gateways.parameters;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class CustomerCard {
 
@@ -102,7 +102,7 @@ public class CustomerCard {
      * This method populates test values for this customer. Use this method for
      * test purpose only.
      *
-     * @return
+     * @return this class object for chaining
      */
     public CustomerCard populateTestValues() {
         this.setName("test cardname");

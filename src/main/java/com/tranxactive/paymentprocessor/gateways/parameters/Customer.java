@@ -7,7 +7,7 @@ package com.tranxactive.paymentprocessor.gateways.parameters;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class Customer {
 
