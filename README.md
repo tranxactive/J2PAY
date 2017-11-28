@@ -1,22 +1,99 @@
 # J2Pay
 
-**version 2.0**
+**version 1.0**
 
-J2Pay is a payment processing library for Java.
+J2Pay is a multi-gateway payment processing library for Java. Which provides simple and generic api for all gateways.
+It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write one code for all gateways. It excludes the efforts of reading docs for individual gateways.
+
+## Why use J2Pay
+
+1. You want multi gateway support in your application.
+2. You do not have time for learning individual payment gateways docs that are also (poorly documented).
+3. You want to support multiple payment gateways in your application without worrying about the implemention of each gateways.
+4. You want to use single api for each gateway.
+5. You dont want to write seperate logic for each gateway.
+
+## Generic Request/Response.
+
+If you would like to work with multiple gateways the main problem developers usually face are api prameters names.
+
+for example.
+
+some gateways 
+take first name as fname or first_name or
+take card number as CardNumber or Card_Number or card.
+
+J2Pay excludes this type of efforts and provide classes for customer details and customer cards which will remain same for all geteways. (for more details see 5 minut example below).
+
+same problem when parsing gateway response.
+
+J2Pay also excluded this type of efforts and provide generic response for all gateways.
+
+for example.
+
+when a transaction is successfully processed some gateways return transaction id as transaction_id or transId or trans_tag blah blah.
+but if you are using J2pay you will always receive "transactionId".
+
+here is the sample response.
+
+```json
+{  
+   "lr":{  
+      "maskedCard":"542400******0015",
+      "customerProfileId":"1813701920",
+      "success":true,
+      "paymentProfileId":"1808392124",
+      "cardExpiryYear":"2017",
+      "message":"This transaction has been approved.",
+      "cardFirst6":"542400",
+      "cardExpiryMonth":"12",
+      "transactionId":"60035117709",
+      "cardLast4":"0015"
+   },
+   "gr":{  
+      "createTransactionResponse":{  
+         "xmlns:xsd":"http://www.w3.org/2001/XMLSchema",
+         "xmlns":"AnetApi/xml/v1/schema/AnetApiSchema.xsd",
+         "transactionResponse":{  
+            "cvvResultCode":"P",
+            "transHashSha2":"",
+            "authCode":"A1IG4K",
+            "cavvResultCode":2,
+            "transId":60035117709 . . .
+..........................................................................................
+            this part is removed to make this doc simple.
+..........................................................................................
+}
+```
+
+As you can see J2pay api response is simple json and divided into two keys.
+
+1) lr --> short for library response.
+2) gr --> short for gateway response.
+
+J2pay response makes it simple for developer to check the gateways response, as you know gateways return a very large response.
+to make it simple for the developers J2pay divides the gateway response into two keys lr and gr.
+
+lr respose which means library response that only contains the values that library thinks important for you and could be usefull for further actions like refund/void/rebill.
+
+however you can also see the gateway full response in gr key for some debugging purpose.
 
 ## Supported Gateways
+
+J2Pay is extending day by day developers are trying there best to implement big number of gateways only for you.
+
+If your desired gateway is not in the list dont hesitate you can directly write us at info@tranxactive.com or you can create an issue in this repository and we will try our best to integrate that gatway as soon as possible.
 
 1. Authorize.net
 2. NMI
 
 `newly intergrated gateways will be added in this list.`
 
-If your desired gateway is not in the list you can write us at info@tranxactive.com and we will try our best to integrate that gatway as soon as possible.
-
 **Goals of this library**
 
 * Developer should be able to integrate any gateway without the need of reading documention of specific gateway.
 * Provide generic methods for all gateways.
+* Provide generic response for all gateways.
 
 This library will be focusing on four major methods of gateways.
 
@@ -43,7 +120,7 @@ Here is the list of some major classes you must know before starting working on 
 * JSONObject, Represent the json data. also will be using for posting dynamic gateway data.
 * AvailableGateways, enum contains the list of supported gateways. we will be passing this to GatewayFactory to get the desired gateway class object.
 
-# Example
+# Example (Understanding library in 5 minutes)
 
 If you are using maven you can add dependency.
 
@@ -102,7 +179,7 @@ As you can see for Authorize api parameters are name and transactionKey.
 We will populate these values and pass to purchase method.
 
 ```java
-apiSampleParameters.put("name", "<your acount's use name here>");
+apiSampleParameters.put("name", "<your acount's user name here>");
 apiSampleParameters.put("transactionKey", "<your account's transaction key here>");
 ```
 
@@ -161,7 +238,7 @@ response.getContent();
 Gateway gateway = GatewayFactory.getGateway(AvailableGateways.AUTHORIZE);
 JSONObject apiSampleParameters = gateway.getApiSampleParameters();
 
-apiSampleParameters.put("name", "<your acount's use name here>");
+apiSampleParameters.put("name", "<your acount's user name here>");
 apiSampleParameters.put("transactionKey", "<your account's transaction key here>");
 
 Customer customer = new Customer();
