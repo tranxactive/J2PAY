@@ -3,7 +3,11 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.paymentprocessor.gateways;
+package com.tranxactive.paymentprocessor.gateways.core;
+
+import com.tranxactive.paymentprocessor.gateways.AuthorizeGateway;
+import com.tranxactive.paymentprocessor.gateways.NMIGateway;
+import com.tranxactive.paymentprocessor.gateways.PayeezyGateway;
 
 /**
  *
@@ -18,6 +22,8 @@ public class GatewayFactory {
                 return new AuthorizeGateway();
             case NMI:
                 return new NMIGateway();                
+            case PAYEEZY:
+                return new PayeezyGateway();
             default:
                 return null;
         }        

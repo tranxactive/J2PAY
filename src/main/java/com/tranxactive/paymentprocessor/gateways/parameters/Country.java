@@ -510,40 +510,40 @@ public enum Country {
     ZMB("ZM", "ZMB", "Zambia"),
     ZWE("ZW", "ZWE", "Zimbabwe");
 
-    private String codeAlpha2, codeAlpha3, name;
+    private String codeISO2, codeISO3, name;
 
     Country(String codeAplha2, String codeAlpha3, String fullName) {
-        this.codeAlpha2 = codeAplha2;
-        this.codeAlpha3 = codeAlpha3;
+        this.codeISO2 = codeAplha2;
+        this.codeISO3 = codeAlpha3;
         this.name = fullName;
     }
 
     /**
-     * @return the codeAlpha2
+     * @return the codeISO2
      */
-    public String getCodeAlpha2() {
-        return codeAlpha2;
+    public String getCodeISO2() {
+        return codeISO2;
     }
 
     /**
-     * @param codeAlpha2 the codeAlpha2 to set
+     * @param codeISO2 the codeISO2 to set
      */
-    public void setCodeAlpha2(String codeAlpha2) {
-        this.codeAlpha2 = codeAlpha2;
+    public void setCodeISO2(String codeISO2) {
+        this.codeISO2 = codeISO2;
     }
 
     /**
-     * @return the codeAlpha3
+     * @return the codeISO3
      */
-    public String getCodeAlpha3() {
-        return codeAlpha3;
+    public String getCodeISO3() {
+        return codeISO3;
     }
 
     /**
-     * @param codeAlpha3 the codeAlpha3 to set
+     * @param codeISO3 the codeISO3 to set
      */
-    public void setCodeAlpha3(String codeAlpha3) {
-        this.codeAlpha3 = codeAlpha3;
+    public void setCodeISO3(String codeISO3) {
+        this.codeISO3 = codeISO3;
     }
 
     /**

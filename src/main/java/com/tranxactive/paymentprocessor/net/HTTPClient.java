@@ -5,6 +5,7 @@
  */
 package com.tranxactive.paymentprocessor.net;
 
+import com.tranxactive.paymentprocessor.gateways.responses.ErrorResponse;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -28,7 +29,8 @@ public class HTTPClient {
      * @param url The url to hit request with/without get parameters i.e
      * http://127.0.0.1/index.php?param1=val1&amp;param2=val2
      * @return The HTTPResponse
-     * @throws java.io.IOException in case of any failure to communicating the server
+     * @throws java.io.IOException in case of any failure to communicating the
+     * server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      */
     public static HTTPResponse httpGet(String url) throws IOException {
@@ -54,39 +56,42 @@ public class HTTPClient {
      * @param url The url on which the request will be hit.
      * @param postParams parameters which will be passed for post.
      * @param contentType content-type in which data will be posted.
-     * @param charset the charset in which request will be posted if null is provided contentType charset will be used.
+     * @param charset the charset in which request will be posted if null is
+     * provided contentType charset will be used.
      * @return The HTTPResponse class.
-     * @throws java.io.IOException in case of any failure to communicating the server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      * @see ContentType
      */
-    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, Charset charset) throws IOException {
+    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, Charset charset) {
 
         HTTPResponse hTTPResponse;
-        long startTime, endTime;
+
+        long startTime = System.currentTimeMillis(), endTime;
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(postParams));
-            if(charset == null){
+            if (charset == null) {
                 httpPost.addHeader("Content-Type", contentType.toString());
-            }else {
+            } else {
                 httpPost.addHeader("Content-Type", ContentType.create(contentType.getMimeType(), charset).toString());
             }
 
             startTime = System.currentTimeMillis();
 
             CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpPost);
-            
+
             endTime = System.currentTimeMillis();
-            
+
             hTTPResponse = new HTTPResponse(closeableHttpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(closeableHttpResponse.getEntity()).replaceFirst("^\uFEFF", ""), endTime - startTime);
             hTTPResponse.setRequestString(postParams);
             EntityUtils.consume(closeableHttpResponse.getEntity());
+        } catch (IOException e) {
+            return new HTTPResponse(-1, new ErrorResponse("could not connect to host", null).getResponse().toString(), System.currentTimeMillis() - startTime);
         }
         return hTTPResponse;
 
     }
-    
+
     /**
      * This method is the wrapper of apache http client post request.
      *
@@ -94,13 +99,12 @@ public class HTTPClient {
      * @param postParams parameters which will be passed for post.
      * @param contentType content-type in which data will be posted.
      * @return The HTTPResponse class.
-     * @throws java.io.IOException in case of any failure to communicating the server
      * @see com.tranxactive.paymentprocessor.net.HTTPResponse
      * @see ContentType
      */
-    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType) throws IOException {
+    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType) {
         return httpPost(url, postParams, contentType, null);
-    
+
     }
 
 }

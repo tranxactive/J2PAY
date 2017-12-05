@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.paymentprocessor.gateways;
+package com.tranxactive.paymentprocessor.gateways.core;
 
 import com.tranxactive.paymentprocessor.gateways.parameters.Currency;
 import com.tranxactive.paymentprocessor.gateways.parameters.Customer;
@@ -17,10 +17,14 @@ import org.json.JSONObject;
  */
 public abstract class Gateway implements GatewaySampleParameters {
 
-    private boolean testMode;
+    private boolean testMode = false;
+    private boolean rebillSupport = true;
 
     public Gateway() {
-        this.testMode = false;
+    }
+    
+    public Gateway(boolean rebillSupport){
+        this.rebillSupport = rebillSupport;
     }
 
     /**
@@ -124,6 +128,22 @@ public abstract class Gateway implements GatewaySampleParameters {
      */
     public void setTestMode(boolean testMode) {
         this.testMode = testMode;
+    }
+
+    /**
+     * This method is used to check if rebill is supported by this gateway.
+     * @return the rebillSupport
+     */
+    public boolean isRebillSupport() {
+        return rebillSupport;
+    }
+
+    /**
+     * This method is internally used by gateways to enable if rebill is supported.
+     * @param rebillSupport the rebillSupport to set
+     */
+    protected void setRebillSupport(boolean rebillSupport) {
+        this.rebillSupport = rebillSupport;
     }
 
 }

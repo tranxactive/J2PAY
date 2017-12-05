@@ -5,16 +5,20 @@
  */
 package com.tranxactive.paymentprocessor.gateways;
 
+import com.tranxactive.paymentprocessor.gateways.core.Gateway;
 import com.tranxactive.paymentprocessor.gateways.parameters.Currency;
 import com.tranxactive.paymentprocessor.gateways.parameters.Customer;
 import com.tranxactive.paymentprocessor.gateways.parameters.CustomerCard;
+import com.tranxactive.paymentprocessor.gateways.parameters.ParamList;
+import com.tranxactive.paymentprocessor.gateways.responses.ErrorResponse;
+import com.tranxactive.paymentprocessor.gateways.responses.PurchaseResponse;
+import com.tranxactive.paymentprocessor.gateways.responses.RebillResponse;
+import com.tranxactive.paymentprocessor.gateways.responses.RefundResponse;
+import com.tranxactive.paymentprocessor.gateways.responses.VoidResponse;
 import com.tranxactive.paymentprocessor.net.HTTPClient;
 import com.tranxactive.paymentprocessor.net.HTTPResponse;
 import com.tranxactive.paymentprocessor.net.XMLHelper;
-import java.io.IOException;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
@@ -26,209 +30,260 @@ public class AuthorizeGateway extends Gateway {
 
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
-        JSONObject response;
-        JSONObject lr = new JSONObject();
-        JSONObject finalResponse = new JSONObject();
+
+        JSONObject resp;
         String requestString = this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount);
+
+        PurchaseResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        HTTPResponse httpResponse;
 
         int result;
 
-        try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
-            response = XMLHelper.toJson(httpResponse.getContent());
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
 
-            if (response.has("createTransactionResponse")) {
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
 
-                if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
-                    result = response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
-                    if (result == 1) {
-                        lr.put("success", true);
-                        lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
-                        lr.put("cardFirst6", customerCard.getFirst6());
-                        lr.put("cardLast4", customerCard.getLast4());
-                        lr.put("maskedCard", customerCard.getMaskedCard());
-                        lr.put("cardExpiryMonth", customerCard.getExpiryMonth());
-                        lr.put("cardExpiryYear", customerCard.getExpiryYear());
+        resp = XMLHelper.toJson(httpResponse.getContent());
 
-                        if (response.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").has("customerProfileId")) {
-                            lr.put("customerProfileId", response.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").get("customerProfileId").toString());
-                            lr.put("paymentProfileId", response.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").getJSONObject("customerPaymentProfileIdList").get("numericString").toString());
-                        }
+        if (resp.has("createTransactionResponse")) {
 
-                    } else {
-                        httpResponse.setSuccessful(false);
-                        lr.put("success", false);
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    httpResponse.setSuccessful(true);
+                    successResponse = new PurchaseResponse();
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+                    successResponse.setCardValuesFrom(customerCard);
+                    successResponse.setAmount(amount);
+                    successResponse.setCurrencyCode(currency);
+
+                    if (resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").has("customerProfileId")) {
+                        successResponse.setRebillParams(new JSONObject()
+                                .put("customerProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").get("customerProfileId").toString())
+                                .put("paymentProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").getJSONObject("customerPaymentProfileIdList").get("numericString").toString())
+                        );
+                    }else{
+                        successResponse.setRebillParams(null);
                     }
+
+                    successResponse.setRefundParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                            .put(ParamList.CARD_LAST_4.getName(), customerCard.getLast4())
+                    );
+
+                    successResponse.setVoidParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
+
                 } else {
-                    httpResponse.setSuccessful(false);
-                    lr.put("success", false);
-                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
                 }
             } else {
-                httpResponse.setSuccessful(false);
-                lr.put("success", false);
-                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
-
-            finalResponse.put("lr", lr);
-            finalResponse.put("gr", response);
-            httpResponse.setContent(finalResponse.toString());
-
-            return httpResponse;
-
-        } catch (IOException ex) {
-            Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
-        return null;
+
+        //final response.
+        if (successResponse != null) {
+            successResponse.setGatewayResponse(resp);
+            httpResponse.setContent(successResponse.getResponse().toString());
+        } else {
+            errorResponse.setGatewayResponse(resp);
+            httpResponse.setContent(errorResponse.getResponse().toString());
+        }
+
+        return httpResponse;
     }
 
     @Override
     public HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount) {
 
-        JSONObject response;
-        JSONObject lr = new JSONObject();
-        int result;
-        JSONObject finalResponse = new JSONObject();
+        JSONObject resp;
+
         String requestString = this.buildRefundParameters(apiParameters, refundParameters, amount);
-        try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
-            response = XMLHelper.toJson(httpResponse.getContent());
 
-            if (response.has("createTransactionResponse")) {
+        RefundResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
 
-                if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
-                    result = response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
-                    if (result == 1) {
-                        lr.put("success", true);
-                        lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+        HTTPResponse httpResponse;
 
-                    } else {
-                        httpResponse.setSuccessful(false);
-                        lr.put("success", false);
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
-                    }
+        int result;
+
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        resp = XMLHelper.toJson(httpResponse.getContent());
+
+        if (resp.has("createTransactionResponse")) {
+
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    httpResponse.setSuccessful(true);
+                    successResponse = new RefundResponse();
+                    
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+                    successResponse.setAmount(amount);
+                    
+                    successResponse.setVoidParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
                 } else {
-                    httpResponse.setSuccessful(false);
-                    lr.put("success", false);
-                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
                 }
             } else {
-                httpResponse.setSuccessful(false);
-                lr.put("success", false);
-                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
-
-            finalResponse.put("lr", lr);
-            finalResponse.put("gr", response);
-            httpResponse.setContent(finalResponse.toString());
-
-            return httpResponse;
-
-        } catch (IOException ex) {
-            Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
-        return null;
+
+        //final response.
+        if (successResponse != null) {
+            successResponse.setGatewayResponse(resp);
+            httpResponse.setContent(successResponse.getResponse().toString());
+        } else {
+            errorResponse.setGatewayResponse(resp);
+            httpResponse.setContent(errorResponse.getResponse().toString());
+        }
+
+        return httpResponse;
     }
 
     @Override
     public HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
 
-        JSONObject response;
-        JSONObject lr = new JSONObject();
-        int result;
-        JSONObject finalResponse = new JSONObject();
+        JSONObject resp;
+
         String requestString = this.buildRebillParameters(apiParameters, rebillParameters, amount);
 
-        try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
-            response = XMLHelper.toJson(httpResponse.getContent());
+        RebillResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
 
-            if (response.has("createTransactionResponse")) {
+        HTTPResponse httpResponse;
 
-                if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
-                    result = response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
-                    if (result == 1) {
-                        lr.put("success", true);
-                        lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+        int result;
 
-                    } else {
-                        httpResponse.setSuccessful(false);
-                        lr.put("success", false);
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
-                    }
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        resp = XMLHelper.toJson(httpResponse.getContent());
+
+        if (resp.has("createTransactionResponse")) {
+
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    String cardLast4 = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("accountNumber").toString();
+                    cardLast4 = cardLast4.substring(cardLast4.length() - 4, cardLast4.length());
+
+                    httpResponse.setSuccessful(true);
+                    successResponse = new RebillResponse();
+                    
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+                    successResponse.setAmount(amount);
+
+                    successResponse.setRebillParams(rebillParameters);
+
+                    successResponse.setRefundParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                            .put(ParamList.CARD_LAST_4.getName(), cardLast4)
+                    );
+
+                    successResponse.setVoidParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
+
                 } else {
-                    httpResponse.setSuccessful(false);
-                    lr.put("success", false);
-                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
                 }
             } else {
-                httpResponse.setSuccessful(false);
-                lr.put("success", false);
-                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
-
-            finalResponse.put("lr", lr);
-            finalResponse.put("gr", response);
-            httpResponse.setContent(finalResponse.toString());
-
-            return httpResponse;
-        } catch (IOException ex) {
-            Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
-        return null;
+
+        //final response.
+        if (successResponse != null) {
+            successResponse.setGatewayResponse(resp);
+            httpResponse.setContent(successResponse.getResponse().toString());
+        } else {
+            errorResponse.setGatewayResponse(resp);
+            httpResponse.setContent(errorResponse.getResponse().toString());
+        }
+
+        return httpResponse;
+
     }
 
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
 
-        JSONObject response;
-        JSONObject lr = new JSONObject();
-        int result;
-        JSONObject finalResponse = new JSONObject();
+        JSONObject resp;
         String requestString = this.buildVoidParameters(apiParameters, voidParameters);
 
-        try {
-            HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
-            response = XMLHelper.toJson(httpResponse.getContent());
+        VoidResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
 
-            if (response.has("createTransactionResponse")) {
+        HTTPResponse httpResponse;
 
-                if (response.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
-                    result = response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
-                    if (result == 1) {
-                        lr.put("success", true);
-                        lr.put("transactionId", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+        int result;
 
-                    } else {
-                        httpResponse.setSuccessful(false);
-                        lr.put("success", false);
-                        lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
-                    }
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        resp = XMLHelper.toJson(httpResponse.getContent());
+
+        if (resp.has("createTransactionResponse")) {
+
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    httpResponse.setSuccessful(true);
+                    successResponse = new VoidResponse();
+
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+
                 } else {
-                    httpResponse.setSuccessful(false);
-                    lr.put("success", false);
-                    lr.put("message", response.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
                 }
             } else {
-                httpResponse.setSuccessful(false);
-                lr.put("success", false);
-                lr.put("message", response.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
             }
-
-            finalResponse.put("lr", lr);
-            finalResponse.put("gr", response);
-            httpResponse.setContent(finalResponse.toString());
-
-            return httpResponse;
-        } catch (IOException ex) {
-            Logger.getLogger(AuthorizeGateway.class.getName()).log(Level.SEVERE, null, ex);
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
-        return null;
+
+        //final response.
+        if (successResponse != null) {
+            successResponse.setGatewayResponse(resp);
+            httpResponse.setContent(successResponse.getResponse().toString());
+        } else {
+            errorResponse.setGatewayResponse(resp);
+            httpResponse.setContent(errorResponse.getResponse().toString());
+        }
+
+        return httpResponse;
 
     }
 
@@ -242,10 +297,10 @@ public class AuthorizeGateway extends Gateway {
     @Override
     public JSONObject getRefundSampleParameters() {
         return new JSONObject()
-                .put("transactionId", "the transaction id which will be refunded")
-                .put("cardLast4", "last 4 digits of card")
-                .put("cardExpiryMonth", "must be 2 digits expiry month of card i.e for jan 01")
-                .put("cardExpiryYear", "must be 4 digits expiry year of card i.e 2017");
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded")
+                .put(ParamList.CARD_LAST_4.getName(), "last 4 digits of card")
+                .put(ParamList.CARD_EXPIRY_MONTH.getName(), "must be 2 digits expiry month of card i.e for jan 01")
+                .put(ParamList.CARD_EXPIRY_YEAR.getName(), "must be 4 digits expiry year of card i.e 2017");
     }
 
     @Override
@@ -258,7 +313,7 @@ public class AuthorizeGateway extends Gateway {
     @Override
     public JSONObject getVoidSampleParameters() {
         return new JSONObject()
-                .put("transactionId", "the transaction id which will be void");
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be void");
     }
 
     //private methods are starting below.
@@ -287,6 +342,7 @@ public class AuthorizeGateway extends Gateway {
                 .append("</profile>")
                 .append("<customer>")
                 .append("<id>").append(this.getUniqueCustomerId()).append("</id>")
+                .append("<email>").append(customer.getEmail()).append("</email>")
                 .append("</customer>")
                 .append("<billTo>")
                 .append("<firstName>").append(customer.getFirstName()).append("</firstName>")
@@ -295,7 +351,8 @@ public class AuthorizeGateway extends Gateway {
                 .append("<city>").append(customer.getCity()).append("</city>")
                 .append("<state>").append(customer.getState()).append("</state>")
                 .append("<zip>").append(customer.getZip()).append("</zip>")
-                .append("<country>").append(customer.getCountry().getCodeAlpha3()).append("</country>")
+                .append("<country>").append(customer.getCountry().getCodeISO3()).append("</country>")
+                .append("<phoneNumber>").append(customer.getPhoneNumber()).append("</phoneNumber>")
                 .append("</billTo>")
                 .append("<customerIP>").append(customer.getIp()).append("</customerIP>")
                 .append("</transactionRequest>")
@@ -320,11 +377,11 @@ public class AuthorizeGateway extends Gateway {
                 .append("<amount>").append(Float.toString(amount)).append("</amount>")
                 .append("<payment>")
                 .append("<creditCard>")
-                .append("<cardNumber>").append(refundParameters.getString("cardLast4")).append("</cardNumber>")
-                .append("<expirationDate>").append(refundParameters.getString("cardExpiryMonth")).append(refundParameters.getString("cardExpiryYear").substring(2)).append("</expirationDate>")
+                .append("<cardNumber>").append(refundParameters.getString(ParamList.CARD_LAST_4.getName())).append("</cardNumber>")
+                .append("<expirationDate>XXXX")/*.append(refundParameters.getString(ParamList.CARD_EXPIRY_MONTH.getName())).append(refundParameters.getString(ParamList.CARD_EXPIRY_YEAR.getName()).substring(2))*/.append("</expirationDate>")
                 .append("</creditCard>")
                 .append("</payment>")
-                .append("<refTransId>").append(refundParameters.getString("transactionId")).append("</refTransId>")
+                .append("<refTransId>").append(refundParameters.getString(ParamList.TRANSACTION_ID.getName())).append("</refTransId>")
                 .append("</transactionRequest>")
                 .append("</createTransactionRequest>");
 
@@ -344,7 +401,7 @@ public class AuthorizeGateway extends Gateway {
                 .append("</merchantAuthentication>")
                 .append("<transactionRequest>")
                 .append("<transactionType>").append("voidTransaction").append("</transactionType>")
-                .append("<refTransId>").append(voidParameters.getString("transactionId")).append("</refTransId>")
+                .append("<refTransId>").append(voidParameters.getString(ParamList.TRANSACTION_ID.getName())).append("</refTransId>")
                 .append("</transactionRequest>")
                 .append("</createTransactionRequest>");
 
