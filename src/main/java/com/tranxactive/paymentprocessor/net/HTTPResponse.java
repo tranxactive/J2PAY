@@ -5,6 +5,8 @@
  */
 package com.tranxactive.paymentprocessor.net;
 
+import org.json.JSONObject;
+
 /**
  * This class provides simplest handling of http response.
  *
@@ -67,6 +69,14 @@ public class HTTPResponse {
      */
     public void setContent(String content) {
         this.content = content;
+    }
+    
+    /**
+     *
+     * @return the JSON response
+     */
+    public JSONObject getJSONResponse(){
+        return new JSONObject(this.content);
     }
 
     /**
