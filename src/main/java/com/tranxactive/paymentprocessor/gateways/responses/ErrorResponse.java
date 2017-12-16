@@ -10,7 +10,7 @@ import org.json.JSONObject;
 
 /**
  *
- * @author ilyas <m.ilyas@live.com>
+ * @author ilyas
  */
 public class ErrorResponse implements Responseable {
 
