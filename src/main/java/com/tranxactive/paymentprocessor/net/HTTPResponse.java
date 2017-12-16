@@ -5,6 +5,8 @@
  */
 package com.tranxactive.paymentprocessor.net;
 
+import org.json.JSONObject;
+
 /**
  * This class provides simplest handling of http response.
  *
@@ -18,7 +20,7 @@ public class HTTPResponse {
 
     private long responseTime;
 
-    private boolean successfull = true;
+    private boolean successful = false;
 
     public HTTPResponse() {
     }
@@ -62,11 +64,19 @@ public class HTTPResponse {
     }
 
     /**
-     * @param content to set the content/body of http reponse <b>will be used by
+     * @param content to set the content/body of http response <b>will be used by
      * http client to update the info</b>
      */
     public void setContent(String content) {
         this.content = content;
+    }
+    
+    /**
+     *
+     * @return the JSON response
+     */
+    public JSONObject getJSONResponse(){
+        return new JSONObject(this.content);
     }
 
     /**
@@ -78,7 +88,7 @@ public class HTTPResponse {
     }
 
     /**
-     * @param responseTime to set the reponse time in milliseconds that http
+     * @param responseTime to set the response time in milliseconds that http
      * request took to complete execution.
      */
     public void setResponseTime(long responseTime) {
@@ -90,14 +100,14 @@ public class HTTPResponse {
      * @return the status of Response.
      */
     public boolean isSuccessful() {
-        return successfull;
+        return successful;
     }
 
     /**
-     * @param successfull the successfull to set
+     * @param successfull the successful to set
      */
     public void setSuccessful(boolean successfull) {
-        this.successfull = successfull;
+        this.successful = successfull;
     }
 
     /**
