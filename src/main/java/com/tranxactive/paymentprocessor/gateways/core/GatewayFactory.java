@@ -8,6 +8,7 @@ package com.tranxactive.paymentprocessor.gateways.core;
 import com.tranxactive.paymentprocessor.gateways.AuthorizeGateway;
 import com.tranxactive.paymentprocessor.gateways.NMIGateway;
 import com.tranxactive.paymentprocessor.gateways.PayeezyGateway;
+import com.tranxactive.paymentprocessor.gateways.PayflowProGateway;
 
 /**
  *
@@ -24,6 +25,8 @@ public class GatewayFactory {
                 return new NMIGateway();                
             case PAYEEZY:
                 return new PayeezyGateway();
+            case PAYFLOWPRO:
+                return new PayflowProGateway();
             default:
                 return null;
         }        
