@@ -13,6 +13,7 @@ public enum AvailableGateways {
 
     AUTHORIZE,
     NMI,
-    PAYEEZY;
+    PAYEEZY,
+    PAYFLOWPRO;
 
 }
