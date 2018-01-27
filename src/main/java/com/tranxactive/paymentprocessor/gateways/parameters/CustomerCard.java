@@ -13,7 +13,7 @@ public class CustomerCard {
 
     private String name;
     private String number;
-    private int cvv;
+    private String cvv;
     private String expiryMonth;
     private String expiryYear;
 
@@ -52,7 +52,7 @@ public class CustomerCard {
     /**
      * @return the cvv
      */
-    public int getCvv() {
+    public String getCvv() {
         return cvv;
     }
 
@@ -60,7 +60,7 @@ public class CustomerCard {
      * @param cvv the cvv to set
      * @return this class object for chaining
      */
-    public CustomerCard setCvv(int cvv) {
+    public CustomerCard setCvv(String cvv) {
         this.cvv = cvv;
         return this;
     }
@@ -107,7 +107,7 @@ public class CustomerCard {
     public CustomerCard populateTestValues() {
         this.setName("test cardname");
         this.setNumber("5424000000000015");
-        this.setCvv(123);
+        this.setCvv("123");
         this.setExpiryMonth("12");
         this.setExpiryYear("2017");
 
