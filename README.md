@@ -35,6 +35,14 @@ but if you are using J2pay you will always receive "transactionId".
 
 You can see J2Pay official documentation and contributors guide on [j2pay.org](http://j2pay.org/)
 
+# Contributing
+
+1. Fork the project.
+2. Make your feature addition or bug fix.
+3. Commit just the modifications.
+4. Ensure your code is nicely formatted.
+5. Send the pull request.
+
 # Contact us.
 
 Feel free to contact us at info@tranxactive.com.
