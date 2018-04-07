@@ -26,18 +26,14 @@ public class BillproGateway extends Gateway {
 
     private final String url = "https://gateway.billpro.com";
 
-//    public BillproGateway() {
-//        super(false);
-//    }
-
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
-        JSONObject resp = null;
+
+        JSONObject resp;
         int result;
 
         String reference = this.getUniqueCustomerId();
-        apiParameters.put("Reference", reference);
-        String requestString = this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount);
+        String requestString = this.buildPurchaseParameters(apiParameters, reference, customer, customerCard, currency, amount);
 
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
@@ -78,7 +74,6 @@ public class BillproGateway extends Gateway {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
         }
 
-
         //final response.
         if (successResponse != null) {
             successResponse.setGatewayResponse(resp);
@@ -93,7 +88,7 @@ public class BillproGateway extends Gateway {
 
     @Override
     public HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        JSONObject resp = null;
+        JSONObject resp;
         int result;
 
         String requestString = this.buildRefundParameters(apiParameters, refundParameters, amount);
@@ -125,7 +120,6 @@ public class BillproGateway extends Gateway {
         } else {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
         }
-
 
         //final response.
         if (successResponse != null) {
@@ -200,7 +194,7 @@ public class BillproGateway extends Gateway {
 
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
-        JSONObject resp = null;
+        JSONObject resp;
         int result;
 
         String requestString = this.buildVoidParameters(apiParameters, voidParameters);
@@ -269,7 +263,7 @@ public class BillproGateway extends Gateway {
     }
 
     //private methods are starting below.
-    private String buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+    private String buildPurchaseParameters(JSONObject apiParameters, String reference, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
         StringBuilder finalParams = new StringBuilder();
 
@@ -279,7 +273,7 @@ public class BillproGateway extends Gateway {
                 .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
                 .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
                 .append("<Transaction>")
-                .append("<Reference>").append(apiParameters.getString("Reference")).append("</Reference>")
+                .append("<Reference>").append(reference).append("</Reference>")
                 .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
                 .append("<Currency>").append(currency).append("</Currency>")
                 .append("<Email>").append(customer.getEmail()).append("</Email>")
@@ -291,7 +285,7 @@ public class BillproGateway extends Gateway {
                 .append("<City>").append(customer.getCity()).append("</City>")
                 .append("<State>").append(customer.getState()).append("</State>")
                 .append("<PostCode>").append(customer.getZip()).append("</PostCode>")
-                .append("<Country>").append(customer.getCountry()).append("</Country>")
+                .append("<Country>").append(customer.getCountry().getCodeISO2()).append("</Country>")
                 .append("<CardNumber>").append(customerCard.getNumber()).append("</CardNumber>")
                 .append("<CardExpMonth>").append(customerCard.getExpiryMonth()).append("</CardExpMonth>")
                 .append("<CardExpYear>").append(customerCard.getExpiryYear()).append("</CardExpYear>")
@@ -328,7 +322,7 @@ public class BillproGateway extends Gateway {
 
         finalParams
                 .append("<?xml version='1.0' encoding='UTF-8'?>")
-                .append("<Request type='Refund'>")
+                .append("<Request type='Void'>")
                 .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
                 .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
                 .append("<Transaction>")
@@ -354,7 +348,6 @@ public class BillproGateway extends Gateway {
                 .append("<TransactionID>").append(rebillParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
                 .append("</Transaction>")
                 .append("</Request>");
-
 
         return finalParams.toString();
     }
