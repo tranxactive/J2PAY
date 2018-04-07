@@ -72,7 +72,6 @@ public class BillproGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                    .put(ParamList.AMOUNT.getName(), amount)
             );
 
         } else {
@@ -121,7 +120,6 @@ public class BillproGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                    .put(ParamList.AMOUNT.getName(), amount)
             );
 
         } else {
@@ -182,7 +180,6 @@ public class BillproGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                    .put(ParamList.AMOUNT.getName(), amount)
             );
 
         } else {
@@ -267,8 +264,7 @@ public class BillproGateway extends Gateway {
     public JSONObject getVoidSampleParameters() {
 
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded")
-                .put(ParamList.AMOUNT.getName(), "the actual amount of original transaction");
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded");
 
     }
 
