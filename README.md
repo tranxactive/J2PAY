@@ -1,8 +1,10 @@
 # J2Pay
 
-**version 2.4.0**
+**version 2.5.1**
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
+
+[![Latest Stable Version](http://j2pay.org/)
 
 ## Why use J2Pay
 
@@ -34,6 +36,16 @@ when a transaction is successfully processed some gateways return transaction id
 but if you are using J2pay you will always receive "transactionId".
 
 You can see J2Pay official documentation and contributors guide on [j2pay.org](http://j2pay.org/)
+
+The following gateways are available.
+
+Gateway | Recurring Support | Maintainer
+--- | --- | ---
+Authorize | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+NMI | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+PAYEEZY | x | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+PAYFLOW PRO | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+BillPro | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 
 # Contributing
 
