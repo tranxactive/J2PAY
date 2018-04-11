@@ -4,8 +4,6 @@
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
 
-Current Stable Version: 2.6.1
-
 ## Why use J2Pay
 
 1. You want multi gateway support in your application.
@@ -39,14 +37,14 @@ You can see J2Pay official documentation and contributors guide on [j2pay.org](h
 
 The following gateways are available.
 
-Gateway | Recurring Support | Maintainer
---- | --- | ---
-Authorize | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-NMI | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-PAYEEZY | x | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-PAYFLOW PRO | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-BillPro | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
-EasyPay | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+#| Gateway | Recurring Support | Maintainer
+--- | --- | --- | ---
+1 | Authorize | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+2 | NMI | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+3 | PAYEEZY | x | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+4 | PAYFLOW PRO | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+5 | BillPro | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+6 | EasyPay | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 
 # Contributing
 
