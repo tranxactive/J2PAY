@@ -1,10 +1,10 @@
 # J2Pay
 
-**version 2.5.1**
+**version 2.6.1**
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
 
-Current Stable Version: 2.5.1
+Current Stable Version: 2.6.1
 
 ## Why use J2Pay
 
