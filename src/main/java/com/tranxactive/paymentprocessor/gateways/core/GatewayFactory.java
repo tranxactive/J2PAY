@@ -26,6 +26,8 @@ public class GatewayFactory {
                 return new PayflowProGateway();
             case BILLPRO:
                 return new BillproGateway();
+            case EASYPAY:
+                return new EasypayGateway();
                 default:
                 return null;
         }        
