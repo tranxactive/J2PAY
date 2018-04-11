@@ -46,6 +46,7 @@ NMI | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 PAYEEZY | x | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 PAYFLOW PRO | ✓ | [Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 BillPro | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+EasyPay | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 
 # Contributing
 
