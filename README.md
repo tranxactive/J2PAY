@@ -46,6 +46,8 @@ The following gateways are available.
 5 | BillPro | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 6 | EasyPay | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 
+**`Note`** if your desired gateway is not in list you are free to create an issue and we will integrate that gateway for you. or you can also write us at info@tranxactive.com
+
 # Contributing
 
 1. Fork the project.
