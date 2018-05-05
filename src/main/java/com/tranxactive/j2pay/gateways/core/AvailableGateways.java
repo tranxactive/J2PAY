@@ -18,13 +18,13 @@ public enum AvailableGateways {
     BILLPRO("com.tranxactive.j2pay.gateways.PayeezyGateway"),
     EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway");
 
-    private String paymentClassPath;
+    private String paymentGateWayClassPath;
     
     AvailableGateways(String classPath) {
-        this.paymentClassPath = classPath;
+        this.paymentGateWayClassPath = classPath;
     }
 
-    public String getPaymentClassPath() {
-        return paymentClassPath;
+    public String getPaymentGatewayClassPath() {
+        return paymentGateWayClassPath;
     }
 }

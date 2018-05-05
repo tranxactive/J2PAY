@@ -13,7 +13,7 @@ public class GatewayFactory {
     public static Gateway getGateway(AvailableGateways availableGateways) {
         
         try {
-            return (Gateway) Class.forName(availableGateways.getPaymentClassPath()).newInstance();
+            return (Gateway) Class.forName(availableGateways.getPaymentGatewayClassPath()).newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
