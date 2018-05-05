@@ -9,11 +9,11 @@ package com.tranxactive.j2pay.gateways.core;
  * @author ilyas
  */
 public class GatewayFactory {
-
+    
     public static Gateway getGateway(AvailableGateways availableGateways) {
         
         try {
-            return (Gateway) Class.forName(availableGateways.toString()).newInstance();
+            return (Gateway) Class.forName(availableGateways.getPaymentClassPath()).newInstance();
         } catch (InstantiationException e) {
             e.printStackTrace();
         } catch (IllegalAccessException e) {
