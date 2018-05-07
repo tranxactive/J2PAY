@@ -13,6 +13,10 @@
 
 *.iml
 
+# Netbeans 
+/nbproject/
+/target/
+
 # Sensitive or high-churn files:
 .idea/**/dataSources/
 .idea/**/dataSources.ids
