@@ -19,7 +19,6 @@ import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
 
 /**
  *
@@ -111,7 +110,13 @@ public class NMIGateway extends Gateway {
 
         if (responseObject.getInt("response_code") == 100) {
             successResponse = new RefundResponse();
-            processResponse(responseObject, httpResponse, successResponse, amount);
+            successResponse.setMessage(responseObject.getString("responsetext"));
+            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setAmount(amount);
+
+            successResponse.setVoidParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
         }

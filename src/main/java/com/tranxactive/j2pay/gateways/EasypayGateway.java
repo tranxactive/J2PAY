@@ -19,7 +19,6 @@ import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueVaultId;
 
 /**
@@ -98,8 +97,18 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if ("1".equals(responseObject.getString("response"))) {
-            processResponse(responseObject, httpResponse, successResponse, amount);
+        if (responseObject.getString("response").equals("1")) {
+            httpResponse.setSuccessful(true);
+            successResponse = new RefundResponse();
+
+            successResponse.setMessage(responseObject.getString("responsetext"));
+            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setAmount(amount);
+
+            successResponse.setVoidParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
+
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
         }
