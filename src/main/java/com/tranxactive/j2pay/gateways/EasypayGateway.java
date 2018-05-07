@@ -18,7 +18,6 @@ import com.tranxactive.j2pay.net.QueryStringHelper;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.util.ParametersBuilder.buildParameters;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueVaultId;
@@ -243,11 +242,20 @@ public class EasypayGateway extends Gateway {
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-        return buildParameters(apiParameters, voidParameters, null);
+        return new JSONObject()
+                .put("type", "void")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("transactionid", voidParameters.getString("transactionId"));
     }
 
     private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        return buildParameters(apiParameters, refundParameters, amount);
+        return new JSONObject()
+                .put("type", "refund")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("transactionid", refundParameters.getString("transactionId"))
+                .put("amount", amount);
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {

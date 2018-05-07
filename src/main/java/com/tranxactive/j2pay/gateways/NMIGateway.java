@@ -18,7 +18,6 @@ import com.tranxactive.j2pay.net.QueryStringHelper;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.util.ParametersBuilder.buildParameters;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
 
@@ -268,11 +267,28 @@ public class NMIGateway extends Gateway {
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-        return buildParameters(apiParameters, voidParameters, null);
+
+        JSONObject object = new JSONObject();
+        object
+                .put("type", "void")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("transactionid", voidParameters.getString(ParamList.TRANSACTION_ID.getName()));
+
+        return object;
     }
 
     private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject voidParameters, float amount) {
-        return buildParameters(apiParameters, voidParameters, amount);
+
+        JSONObject object = new JSONObject();
+        object
+                .put("type", "refund")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("transactionid", voidParameters.getString(ParamList.TRANSACTION_ID.getName()))
+                .put("amount", Float.toString(amount));
+
+        return object;
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
