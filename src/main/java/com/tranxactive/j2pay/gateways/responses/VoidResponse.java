@@ -17,6 +17,7 @@ public class VoidResponse extends CoreResponse {
     protected String transactionId = null;
 
     public VoidResponse() {
+        this.success = true;
     }
 
     public VoidResponse(

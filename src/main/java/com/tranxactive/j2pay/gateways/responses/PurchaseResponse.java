@@ -9,7 +9,11 @@ import org.json.JSONObject;
  *
  * @author dwamara
  */
-public class PurchaseResponse extends TransactionResponse {
+public class PurchaseResponse extends CoreResponse {
+
+    private String transactionId = null;
+    private float amount = 0.0f;
+    private JSONObject voidParams = null;
 
     private Currency currencyCode = null;
 
@@ -23,6 +27,7 @@ public class PurchaseResponse extends TransactionResponse {
     private JSONObject refundParams = null;
 
     public PurchaseResponse() {
+        this.success = true;
     }
 
     public PurchaseResponse(
@@ -176,6 +181,48 @@ public class PurchaseResponse extends TransactionResponse {
         this.setCardExpiryMonth(customerCard.getExpiryMonth());
     }
 
+    /**
+     * @return the transactionId
+     */
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    /**
+     * @param transactionId the transactionId to set
+     */
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    /**
+     * @return the amount
+     */
+    public float getAmount() {
+        return amount;
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    /**
+     * @return the voidParams
+     */
+    public JSONObject getVoidParams() {
+        return voidParams;
+    }
+
+    /**
+     * @param voidParams the voidParams to set
+     */
+    public void setVoidParams(JSONObject voidParams) {
+        this.voidParams = voidParams;
+    }
+
     @Override
     public JSONObject getResponse() {
 
@@ -183,16 +230,16 @@ public class PurchaseResponse extends TransactionResponse {
                 .put(ParamList.LIBRARY_RESPONSE.getName(), new JSONObject()
                         .put(ParamList.SUCCESS.getName(), this.success)
                         .put(ParamList.MESSAGE.getName(), this.message)
-                        .put(ParamList.AMOUNT.getName(), this.amount)
+                        .put(ParamList.AMOUNT.getName(), this.getAmount())
                         .put(ParamList.CURRENCY_CODE.getName(), this.currencyCode)
                         .put(ParamList.CARD_EXPIRY_YEAR.getName(), this.cardExpiryYear)
                         .put(ParamList.CARD_EXPIRY_MONTH.getName(), this.cardExpiryMonth)
                         .put(ParamList.CARD_FIRST_6.getName(), this.cardFirst6)
                         .put(ParamList.CARD_LAST_4.getName(), this.cardLast4)
                         .put(ParamList.MASKED_CARD.getName(), this.maskedCard)
-                        .put(ParamList.TRANSACTION_ID.getName(), this.transactionId)
+                        .put(ParamList.TRANSACTION_ID.getName(), this.getTransactionId())
                         .put(ParamList.REBILL_PARAMS.getName(), this.rebillParams != null ? this.rebillParams : JSONObject.NULL)
-                        .put(ParamList.VOID_PARAMS.getName(), this.voidParams != null ? this.voidParams : JSONObject.NULL)
+                        .put(ParamList.VOID_PARAMS.getName(), this.getVoidParams() != null ? this.getVoidParams() : JSONObject.NULL)
                         .put(ParamList.REFUND_PARAMS.getName(), this.refundParams != null ? this.refundParams : JSONObject.NULL)
                 )
                 .put(ParamList.GATEWAY_RESPONSE.getName(), this.gatewayResponse != null ? this.gatewayResponse : JSONObject.NULL);

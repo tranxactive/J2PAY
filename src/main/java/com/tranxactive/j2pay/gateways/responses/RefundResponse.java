@@ -12,10 +12,14 @@ import org.json.JSONObject;
  *
  * @author ilyas
  */
-public class RefundResponse extends TransactionResponse {
+public class RefundResponse extends CoreResponse {
+
+    private String transactionId = null;
+    private float amount = 0.0f;
+    private JSONObject voidParams = null;
 
     public RefundResponse() {
-
+        this.success = true;
     }
 
     public RefundResponse(
@@ -32,6 +36,48 @@ public class RefundResponse extends TransactionResponse {
         this.voidParams = voidParams;
         this.gatewayResponse = gatewayResponse;
     }
+    
+    /**
+     * @return the transactionId
+     */
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    /**
+     * @param transactionId the transactionId to set
+     */
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
+    }
+
+    /**
+     * @return the amount
+     */
+    public float getAmount() {
+        return amount;
+    }
+
+    /**
+     * @param amount the amount to set
+     */
+    public void setAmount(float amount) {
+        this.amount = amount;
+    }
+
+    /**
+     * @return the voidParams
+     */
+    public JSONObject getVoidParams() {
+        return voidParams;
+    }
+
+    /**
+     * @param voidParams the voidParams to set
+     */
+    public void setVoidParams(JSONObject voidParams) {
+        this.voidParams = voidParams;
+    }
 
     @Override
     public JSONObject getResponse() {
@@ -39,9 +85,9 @@ public class RefundResponse extends TransactionResponse {
                 .put(ParamList.LIBRARY_RESPONSE.getName(), new JSONObject()
                         .put(ParamList.SUCCESS.getName(), this.success)
                         .put(ParamList.MESSAGE.getName(), this.message)
-                        .put(ParamList.AMOUNT.getName(), this.amount)
-                        .put(ParamList.TRANSACTION_ID.getName(), this.transactionId)
-                        .put(ParamList.VOID_PARAMS.getName(), this.voidParams != null ? this.voidParams : JSONObject.NULL)
+                        .put(ParamList.AMOUNT.getName(), this.getAmount())
+                        .put(ParamList.TRANSACTION_ID.getName(), this.getTransactionId())
+                        .put(ParamList.VOID_PARAMS.getName(), this.getVoidParams() != null ? this.getVoidParams() : JSONObject.NULL)
                 )
                 .put(ParamList.GATEWAY_RESPONSE.getName(), this.gatewayResponse != null ? this.gatewayResponse : JSONObject.NULL);
     }
