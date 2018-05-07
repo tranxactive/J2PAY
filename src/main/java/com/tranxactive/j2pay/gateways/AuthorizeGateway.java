@@ -11,17 +11,15 @@ import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
-import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
-import com.tranxactive.j2pay.gateways.responses.RebillResponse;
-import com.tranxactive.j2pay.gateways.responses.RefundResponse;
-import com.tranxactive.j2pay.gateways.responses.VoidResponse;
+import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
-import java.util.Random;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
+
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
 
 /**
  *
@@ -92,14 +90,7 @@ public class AuthorizeGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -151,14 +142,7 @@ public class AuthorizeGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -221,14 +205,7 @@ public class AuthorizeGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
 
     }
@@ -276,14 +253,7 @@ public class AuthorizeGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
 
     }
@@ -342,7 +312,7 @@ public class AuthorizeGateway extends Gateway {
                 .append("<createProfile>").append(true).append("</createProfile>")
                 .append("</profile>")
                 .append("<customer>")
-                .append("<id>").append(this.getUniqueCustomerId()).append("</id>")
+                .append("<id>").append(getUniqueCustomerId()).append("</id>")
                 .append("<email>").append(customer.getEmail()).append("</email>")
                 .append("</customer>")
                 .append("<billTo>")
@@ -434,26 +404,8 @@ public class AuthorizeGateway extends Gateway {
         return finalParams.toString();
     }
 
-    private String getUniqueCustomerId() {
-        String str = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        StringBuilder uniqueString = new StringBuilder(String.valueOf(System.currentTimeMillis()));
-
-        Random random = new Random();
-
-        while (uniqueString.length() < 20) {
-            uniqueString.append(str.charAt(random.nextInt(str.length() - 1)));
-        }
-
-        return uniqueString.toString();
-    }
-
     private String getApiURL() {
-
-        if (isTestMode()) {
-            return "https://apitest.authorize.net/xml/v1/request.api";
-        } else {
-            return "https://api.authorize.net/xml/v1/request.api";
-        }
+        return "https://" + (isTestMode() ? "apitest" : "api") + ".authorize.net/xml/v1/request.api";
     }
 
 }

@@ -5,14 +5,16 @@
  */
 package com.tranxactive.j2pay.net;
 
+import org.json.JSONArray;
+import org.json.JSONObject;
+
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.json.JSONArray;
-import org.json.JSONObject;
+
+import static java.util.logging.Logger.getLogger;
 
 /**
  *
@@ -47,7 +49,7 @@ public class JSONHelper {
                     finalJSONObject.put(key, object.get(key));
                 }
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return null;
             }
         }
@@ -77,7 +79,7 @@ public class JSONHelper {
                     finalJSONArray.put(object);
                 }
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return null;
             }
         }
@@ -113,7 +115,7 @@ public class JSONHelper {
                     finalJSONObject.put(key, object.get(key));
                 }
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return null;
             }
         }
@@ -143,7 +145,7 @@ public class JSONHelper {
                     finalJSONArray.put(object);
                 }
             } catch (UnsupportedEncodingException ex) {
-                Logger.getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
                 return null;
             }
         }

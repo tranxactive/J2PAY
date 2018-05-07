@@ -4,6 +4,9 @@
  * and open the template in the editor.
  */
 package com.tranxactive.j2pay.gateways.core;
+
+import static java.lang.Class.forName;
+
 /**
  *
  * @author ilyas
@@ -13,14 +16,10 @@ public class GatewayFactory {
     public static Gateway getGateway(AvailableGateways availableGateways) {
         
         try {
-            return (Gateway) Class.forName(availableGateways.getPaymentGatewayClassPath()).newInstance();
-        } catch (InstantiationException e) {
+            return (Gateway) forName(availableGateways.getPaymentGatewayClassPath()).newInstance();
+        } catch (InstantiationException | IllegalAccessException | ClassNotFoundException e) {
             e.printStackTrace();
-        } catch (IllegalAccessException e) {
-            e.printStackTrace();
-        } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } 
+        }
         return null;     
     }
 

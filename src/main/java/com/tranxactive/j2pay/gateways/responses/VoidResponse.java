@@ -12,14 +12,9 @@ import org.json.JSONObject;
  *
  * @author ilyas
  */
-public class VoidResponse implements Responseable {
+public class VoidResponse extends CoreResponse {
 
-    private final boolean success = true;
-    private String message = null;
-
-    private String transactionId = null;
-
-    private JSONObject gatewayResponse = null;
+    protected String transactionId = null;
 
     public VoidResponse() {
     }
@@ -29,23 +24,10 @@ public class VoidResponse implements Responseable {
             String transactionId,
             JSONObject gatewayResponse
     ) {
+        this.success = true;
         this.message = message;
         this.transactionId = transactionId;
         this.gatewayResponse = gatewayResponse;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * @param message the message to set
-     */
-    public void setMessage(String message) {
-        this.message = message;
     }
 
     /**
@@ -60,20 +42,6 @@ public class VoidResponse implements Responseable {
      */
     public void setTransactionId(String transactionId) {
         this.transactionId = transactionId;
-    }
-
-    /**
-     * @return the gatewayResponse
-     */
-    public JSONObject getGatewayResponse() {
-        return gatewayResponse;
-    }
-
-    /**
-     * @param gatewayResponse the gatewayResponse to set
-     */
-    public void setGatewayResponse(JSONObject gatewayResponse) {
-        this.gatewayResponse = gatewayResponse;
     }
 
     @Override

@@ -10,17 +10,17 @@ import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
-import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
-import com.tranxactive.j2pay.gateways.responses.RebillResponse;
-import com.tranxactive.j2pay.gateways.responses.RefundResponse;
-import com.tranxactive.j2pay.gateways.responses.VoidResponse;
+import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.JSONHelper;
 import com.tranxactive.j2pay.net.QueryStringHelper;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
+
+import static com.tranxactive.j2pay.gateways.util.ParametersBuilder.buildParameters;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
 
 /**
  *
@@ -37,7 +37,7 @@ public class NMIGateway extends Gateway {
         JSONObject responseObject;
         String requestString;
         String responseString;
-        int responseCode;
+
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
         HTTPResponse httpResponse;
@@ -53,9 +53,8 @@ public class NMIGateway extends Gateway {
 
         responseString = httpResponse.getContent();
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-        responseCode = responseObject.getInt("response_code");
 
-        if (responseCode == 100) {
+        if (responseObject.getInt("response_code") == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -81,14 +80,7 @@ public class NMIGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
 
     }
@@ -100,7 +92,7 @@ public class NMIGateway extends Gateway {
         JSONObject responseObject;
         String requestString;
         String responseString;
-        int responseCode;
+
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
 
@@ -117,31 +109,16 @@ public class NMIGateway extends Gateway {
 
         responseString = httpResponse.getContent();
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-        responseCode = responseObject.getInt("response_code");
 
-        if (responseCode == 100) {
-            httpResponse.setSuccessful(true);
+        if (responseObject.getInt("response_code") == 100) {
             successResponse = new RefundResponse();
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
-            successResponse.setAmount(amount);
-
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
+            processResponse(responseObject, httpResponse, successResponse, amount);
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
 
     }
@@ -153,7 +130,6 @@ public class NMIGateway extends Gateway {
         JSONObject responseObject;
         String requestString;
         String responseString;
-        int responseCode;
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
         HTTPResponse httpResponse;
@@ -169,9 +145,8 @@ public class NMIGateway extends Gateway {
 
         responseString = httpResponse.getContent();
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-        responseCode = responseObject.getInt("response_code");
 
-        if (responseCode == 100) {
+        if (responseObject.getInt("response_code") == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
@@ -195,14 +170,7 @@ public class NMIGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -213,7 +181,7 @@ public class NMIGateway extends Gateway {
         JSONObject responseObject;
         String requestString;
         String responseString;
-        int responseCode;
+
         requestObject = JSONHelper.encode(requestObject);
         requestString = QueryStringHelper.toQueryString(requestObject);
         HTTPResponse httpResponse;
@@ -229,9 +197,8 @@ public class NMIGateway extends Gateway {
 
         responseString = httpResponse.getContent();
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
-        responseCode = responseObject.getInt("response_code");
 
-        if (responseCode == 100) {
+        if (responseObject.getInt("response_code") == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
@@ -243,14 +210,7 @@ public class NMIGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -269,8 +229,7 @@ public class NMIGateway extends Gateway {
 
     @Override
     public JSONObject getRebillSampleParameters() {
-        return new JSONObject()
-                .put("customerVaultId", "the customer vault id");
+        return new JSONObject().put("customerVaultId", "the customer vault id");
     }
 
     @Override
@@ -309,28 +268,11 @@ public class NMIGateway extends Gateway {
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-
-        JSONObject object = new JSONObject();
-        object
-                .put("type", "void")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", voidParameters.getString(ParamList.TRANSACTION_ID.getName()));
-
-        return object;
+        return buildParameters(apiParameters, voidParameters, null);
     }
 
     private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject voidParameters, float amount) {
-
-        JSONObject object = new JSONObject();
-        object
-                .put("type", "refund")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", voidParameters.getString(ParamList.TRANSACTION_ID.getName()))
-                .put("amount", Float.toString(amount));
-
-        return object;
+        return buildParameters(apiParameters, voidParameters, amount);
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {

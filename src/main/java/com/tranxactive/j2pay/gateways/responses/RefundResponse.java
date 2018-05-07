@@ -12,18 +12,7 @@ import org.json.JSONObject;
  *
  * @author ilyas
  */
-public class RefundResponse implements Responseable {
-
-    private final boolean success = true;
-    private String message = null;
-
-    private float amount = 0.0f;
-
-    private String transactionId = null;
-
-    private JSONObject voidParams = null;
-
-    private JSONObject gatewayResponse = null;
+public class RefundResponse extends TransactionResponse {
 
     public RefundResponse() {
 
@@ -36,80 +25,11 @@ public class RefundResponse implements Responseable {
             JSONObject voidParams,
             JSONObject gatewayResponse
     ) {
+        this.success = true;
         this.message = message;
         this.amount = amount;
         this.transactionId = transactionId;
         this.voidParams = voidParams;
-        this.gatewayResponse = gatewayResponse;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * @param message the message to set
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    /**
-     * @return the amount
-     */
-    public float getAmount() {
-        return amount;
-    }
-
-    /**
-     * @param amount the amount to set
-     */
-    public void setAmount(float amount) {
-        this.amount = amount;
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    /**
-     * @return the voidParams
-     */
-    public JSONObject getVoidParams() {
-        return voidParams;
-    }
-
-    /**
-     * @param voidParams the voidParams to set
-     */
-    public void setVoidParams(JSONObject voidParams) {
-        this.voidParams = voidParams;
-    }
-
-    /**
-     * @return the gatewayResponse
-     */
-    public JSONObject getGatewayResponse() {
-        return gatewayResponse;
-    }
-
-    /**
-     * @param gatewayResponse the gatewayResponse to set
-     */
-    public void setGatewayResponse(JSONObject gatewayResponse) {
         this.gatewayResponse = gatewayResponse;
     }
 

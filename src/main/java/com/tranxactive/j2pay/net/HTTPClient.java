@@ -6,8 +6,6 @@
 package com.tranxactive.j2pay.net;
 
 import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import java.io.IOException;
-import java.nio.charset.Charset;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -16,6 +14,11 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+
+import java.io.IOException;
+import java.nio.charset.Charset;
+
+import static org.apache.http.entity.ContentType.create;
 
 /**
  *
@@ -70,11 +73,7 @@ public class HTTPClient {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(postParams));
-            if (charset == null) {
-                httpPost.addHeader("Content-Type", contentType.toString());
-            } else {
-                httpPost.addHeader("Content-Type", ContentType.create(contentType.getMimeType(), charset).toString());
-            }
+            httpPost.addHeader("Content-Type", charset == null ? contentType.toString() : create(contentType.getMimeType(), charset).toString());
 
             startTime = System.currentTimeMillis();
 

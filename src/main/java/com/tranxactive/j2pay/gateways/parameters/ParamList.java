@@ -35,7 +35,7 @@ public enum ParamList {
 
     private final String name;
     
-    private ParamList(String name) {
+    ParamList(String name) {
         this.name = name;
     }
     

@@ -516,6 +516,7 @@ public enum Country {
         this.codeISO2 = codeAplha2;
         this.codeISO3 = codeAlpha3;
         this.name = fullName;
+        this.numericCode = numericCode;
     }
 
     /**
