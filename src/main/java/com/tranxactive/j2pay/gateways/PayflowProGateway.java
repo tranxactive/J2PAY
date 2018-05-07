@@ -9,19 +9,17 @@ import com.tranxactive.j2pay.gateways.core.Gateway;
 import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
-import com.tranxactive.j2pay.gateways.parameters.ParamList;
-import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
-import com.tranxactive.j2pay.gateways.responses.RebillResponse;
-import com.tranxactive.j2pay.gateways.responses.RefundResponse;
-import com.tranxactive.j2pay.gateways.responses.VoidResponse;
+import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.JSONHelper;
 import com.tranxactive.j2pay.net.QueryStringHelper;
-import java.util.Random;
-import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
+
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 
 /**
  *
@@ -39,7 +37,7 @@ public class PayflowProGateway extends Gateway {
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -57,15 +55,11 @@ public class PayflowProGateway extends Gateway {
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
 
-            successResponse.setRebillParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            successResponse.setRebillParams(new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
-            
-            successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            successResponse.setRefundParams(new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            successResponse.setVoidParams(new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
 
         } else {
@@ -73,14 +67,7 @@ public class PayflowProGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -93,7 +80,7 @@ public class PayflowProGateway extends Gateway {
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -110,7 +97,7 @@ public class PayflowProGateway extends Gateway {
             successResponse.setAmount(amount);
 
             successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
 
         } else {
@@ -118,14 +105,7 @@ public class PayflowProGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -139,7 +119,7 @@ public class PayflowProGateway extends Gateway {
         RebillResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -156,14 +136,14 @@ public class PayflowProGateway extends Gateway {
             successResponse.setAmount(amount);
 
             successResponse.setRebillParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
             
             successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
             successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
 
         } else {
@@ -171,14 +151,7 @@ public class PayflowProGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -192,7 +165,7 @@ public class PayflowProGateway extends Gateway {
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -212,14 +185,7 @@ public class PayflowProGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -235,19 +201,19 @@ public class PayflowProGateway extends Gateway {
     @Override
     public JSONObject getRefundSampleParameters() {
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
+                .put(TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
     }
 
     @Override
     public JSONObject getRebillSampleParameters() {
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
+                .put(TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
     }
 
     @Override
     public JSONObject getVoidSampleParameters() {
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
+                .put(TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
     }
 
     private JSONObject buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
@@ -273,7 +239,7 @@ public class PayflowProGateway extends Gateway {
                 .put("CUSTIP", customer.getIp())
                 .put("VERBOSITY", "HIGH")
                 .put("RECURRING", "Y")
-                .put("PROFILENAME", this.getUniqueProfileName())
+                .put("PROFILENAME", getUniqueCustomerId())
                 .put("ACTION", "A")
                 ;
     }
@@ -285,7 +251,7 @@ public class PayflowProGateway extends Gateway {
                 .put("VENDOR", apiParameters.getString("VENDOR"))
                 .put("PWD", apiParameters.getString("PWD"))
                 .put("PARTNER", apiParameters.getString("PARTNER"))
-                .put("ORIGID", voidParameters.getString(ParamList.TRANSACTION_ID.getName()))
+                .put("ORIGID", voidParameters.getString(TRANSACTION_ID.getName()))
                 .put("VERBOSITY", "HIGH");
     }
 
@@ -296,7 +262,7 @@ public class PayflowProGateway extends Gateway {
                 .put("VENDOR", apiParameters.getString("VENDOR"))
                 .put("PWD", apiParameters.getString("PWD"))
                 .put("PARTNER", apiParameters.getString("PARTNER"))
-                .put("ORIGID", refundParameters.getString(ParamList.TRANSACTION_ID.getName()))
+                .put("ORIGID", refundParameters.getString(TRANSACTION_ID.getName()))
                 .put("AMT", amount)
                 .put("VERBOSITY", "HIGH");
     }
@@ -309,33 +275,14 @@ public class PayflowProGateway extends Gateway {
                 .put("VENDOR", apiParameters.getString("VENDOR"))
                 .put("PWD", apiParameters.getString("PWD"))
                 .put("PARTNER", apiParameters.getString("PARTNER"))
-                .put("ORIGID", rebillParameters.getString(ParamList.TRANSACTION_ID.getName()))
+                .put("ORIGID", rebillParameters.getString(TRANSACTION_ID.getName()))
                 .put("AMT", amount)
                 .put("VERBOSITY", "HIGH")
                 .put("RECURRING", "Y");
     }
-    
-    private String getUniqueProfileName() {
-        
-        String str = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        StringBuilder uniqueString = new StringBuilder(String.valueOf(System.currentTimeMillis()));
-
-        Random random = new Random();
-
-        while (uniqueString.length() < 32) {
-            uniqueString.append(str.charAt(random.nextInt(str.length() - 1)));
-        }
-
-        return uniqueString.toString();
-    }
 
     private String getApiURL() {
-
-        if (this.isTestMode()) {
-            return "https://pilot-payflowpro.paypal.com";
-        } else {
-            return "https://payflowpro.paypal.com";
-        }
+            return "https://" + (this.isTestMode() ? "pilot-" : "") + "payflowpro.paypal.com";
     }
 
 }

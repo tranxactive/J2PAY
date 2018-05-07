@@ -20,11 +20,11 @@ interface GatewaySampleParameters {
      * @return the sample API parameters required in all kind of merchant
      * interaction.
      */
-    public abstract JSONObject getApiSampleParameters();
+    JSONObject getApiSampleParameters();
 
-    public abstract JSONObject getRefundSampleParameters();
+    JSONObject getRefundSampleParameters();
 
-    public abstract JSONObject getRebillSampleParameters();
+    JSONObject getRebillSampleParameters();
 
-    public abstract JSONObject getVoidSampleParameters();
+    JSONObject getVoidSampleParameters();
 }

@@ -12,20 +12,10 @@ import org.json.JSONObject;
  *
  * @author ilyas
  */
-public class RebillResponse implements Responseable {
-
-    private final boolean success = true;
-    private String message = null;
-
-    private float amount = 0.0f;
-
-    private String transactionId = null;
+public class RebillResponse extends TransactionResponse {
 
     private JSONObject rebillParams = null;
-    private JSONObject voidParams = null;
     private JSONObject refundParams = null;
-
-    private JSONObject gatewayResponse = null;
 
     public RebillResponse() {
     }
@@ -39,7 +29,7 @@ public class RebillResponse implements Responseable {
             JSONObject refundParams,
             JSONObject gatewayResponse
     ) {
-
+        this.success = true;
         this.message = message;
         this.amount = amount;
         this.transactionId = transactionId;
@@ -47,48 +37,6 @@ public class RebillResponse implements Responseable {
         this.voidParams = voidParams;
         this.refundParams = refundParams;
         this.gatewayResponse = gatewayResponse;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * @param message the message to set
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    /**
-     * @return the amount
-     */
-    public float getAmount() {
-        return amount;
-    }
-
-    /**
-     * @param amount the amount to set
-     */
-    public void setAmount(float amount) {
-        this.amount = amount;
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 
     /**
@@ -106,20 +54,6 @@ public class RebillResponse implements Responseable {
     }
 
     /**
-     * @return the voidParams
-     */
-    public JSONObject getVoidParams() {
-        return voidParams;
-    }
-
-    /**
-     * @param voidParams the voidParams to set
-     */
-    public void setVoidParams(JSONObject voidParams) {
-        this.voidParams = voidParams;
-    }
-
-    /**
      * @return the refundParams
      */
     public JSONObject getRefundParams() {
@@ -133,19 +67,6 @@ public class RebillResponse implements Responseable {
         this.refundParams = refundParams;
     }
 
-    /**
-     * @return the gatewayResponse
-     */
-    public JSONObject getGatewayResponse() {
-        return gatewayResponse;
-    }
-
-    /**
-     * @param gatewayResponse the gatewayResponse to set
-     */
-    public void setGatewayResponse(JSONObject gatewayResponse) {
-        this.gatewayResponse = gatewayResponse;
-    }
 
     @Override
     public JSONObject getResponse() {

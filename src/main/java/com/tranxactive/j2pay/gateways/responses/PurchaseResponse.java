@@ -1,8 +1,3 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
 package com.tranxactive.j2pay.gateways.responses;
 
 import com.tranxactive.j2pay.gateways.parameters.Currency;
@@ -12,14 +7,10 @@ import org.json.JSONObject;
 
 /**
  *
- * @author ilyas
+ * @author dwamara
  */
-public class PurchaseResponse implements Responseable {
+public class PurchaseResponse extends TransactionResponse {
 
-    private final boolean success = true;
-    private String message = null;
-
-    private float amount = 0.0f;
     private Currency currencyCode = null;
 
     private String cardExpiryYear = null;
@@ -28,13 +19,8 @@ public class PurchaseResponse implements Responseable {
     private String cardLast4 = null;
     private String maskedCard = null;
 
-    private String transactionId = null;
-
     private JSONObject rebillParams = null;
-    private JSONObject voidParams = null;
     private JSONObject refundParams = null;
-
-    private JSONObject gatewayResponse = null;
 
     public PurchaseResponse() {
     }
@@ -54,6 +40,7 @@ public class PurchaseResponse implements Responseable {
             JSONObject refundParams,
             JSONObject gatewayResponse
     ) {
+        this.success = true;
         this.message = message;
         this.amount = amount;
         this.currencyCode = currencyCode;
@@ -67,41 +54,6 @@ public class PurchaseResponse implements Responseable {
         this.voidParams = voidParams;
         this.refundParams = refundParams;
         this.gatewayResponse = gatewayResponse;
-    }
-
-    /**
-     * @return the success
-     */
-    public boolean isSuccess() {
-        return success;
-    }
-
-    /**
-     * @return the message
-     */
-    public String getMessage() {
-        return message;
-    }
-
-    /**
-     * @param message the message to set
-     */
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
-    /**
-     * @return the amount
-     */
-    public float getAmount() {
-        return amount;
-    }
-
-    /**
-     * @param amount the amount to set
-     */
-    public void setAmount(float amount) {
-        this.amount = amount;
     }
 
     /**
@@ -189,20 +141,6 @@ public class PurchaseResponse implements Responseable {
     }
 
     /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
-    }
-
-    /**
      * @return the rebillParams
      */
     public JSONObject getRebillParams() {
@@ -217,20 +155,6 @@ public class PurchaseResponse implements Responseable {
     }
 
     /**
-     * @return the voidParams
-     */
-    public JSONObject getVoidParams() {
-        return voidParams;
-    }
-
-    /**
-     * @param voidParams the voidParams to set
-     */
-    public void setVoidParams(JSONObject voidParams) {
-        this.voidParams = voidParams;
-    }
-
-    /**
      * @return the refundParams
      */
     public JSONObject getRefundParams() {
@@ -242,20 +166,6 @@ public class PurchaseResponse implements Responseable {
      */
     public void setRefundParams(JSONObject refundParams) {
         this.refundParams = refundParams;
-    }
-
-    /**
-     * @return the gatewayResponse
-     */
-    public JSONObject getGatewayResponse() {
-        return gatewayResponse;
-    }
-
-    /**
-     * @param gatewayResponse the gatewayResponse to set
-     */
-    public void setGatewayResponse(JSONObject gatewayResponse) {
-        this.gatewayResponse = gatewayResponse;
     }
 
     public void setCardValuesFrom(CustomerCard customerCard) {

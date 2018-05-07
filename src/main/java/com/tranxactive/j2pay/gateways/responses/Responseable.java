@@ -13,6 +13,6 @@ import org.json.JSONObject;
  */
 public interface Responseable {
 
-    public abstract JSONObject getResponse();
+    JSONObject getResponse();
 
 }

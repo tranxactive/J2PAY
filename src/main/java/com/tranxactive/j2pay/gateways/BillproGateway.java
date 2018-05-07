@@ -10,18 +10,15 @@ import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
-import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
-import com.tranxactive.j2pay.gateways.responses.RebillResponse;
-import com.tranxactive.j2pay.gateways.responses.RefundResponse;
-import com.tranxactive.j2pay.gateways.responses.VoidResponse;
+import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
-import java.util.Random;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
 
 /**
  * @author tkhan
@@ -36,7 +33,7 @@ public class BillproGateway extends Gateway {
         JSONObject resp;
         int result;
 
-        String reference = this.getUniqueCustomerId();
+        String reference = getUniqueCustomerId();
         String requestString = this.buildPurchaseParameters(apiParameters, reference, customer, customerCard, currency, amount);
 
         PurchaseResponse successResponse = null;
@@ -79,14 +76,7 @@ public class BillproGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -126,14 +116,7 @@ public class BillproGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
 
     }
@@ -185,14 +168,7 @@ public class BillproGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -227,14 +203,7 @@ public class BillproGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(resp);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(resp);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -355,18 +324,4 @@ public class BillproGateway extends Gateway {
 
         return finalParams.toString();
     }
-
-    private String getUniqueCustomerId() {
-        String str = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        StringBuilder uniqueString = new StringBuilder(String.valueOf(System.currentTimeMillis()));
-
-        Random random = new Random();
-
-        while (uniqueString.length() < 20) {
-            uniqueString.append(str.charAt(random.nextInt(str.length() - 1)));
-        }
-
-        return uniqueString.toString();
-    }
-
 }

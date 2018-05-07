@@ -9,7 +9,8 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.logging.Level;
-import java.util.logging.Logger;
+
+import static java.util.logging.Logger.getLogger;
 
 /**
  *
@@ -27,7 +28,7 @@ public class StringHelper {
         try {
             return URLEncoder.encode(str, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
+            getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }
@@ -42,7 +43,7 @@ public class StringHelper {
         try {
             return URLDecoder.decode(str, "UTF-8");
         } catch (UnsupportedEncodingException ex) {
-            Logger.getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
+            getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
             return null;
         }
     }

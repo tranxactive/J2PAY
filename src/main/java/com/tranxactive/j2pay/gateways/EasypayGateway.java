@@ -10,20 +10,18 @@ import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
-import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
-import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
-import com.tranxactive.j2pay.gateways.responses.RebillResponse;
-import com.tranxactive.j2pay.gateways.responses.RefundResponse;
-import com.tranxactive.j2pay.gateways.responses.VoidResponse;
+import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.JSONHelper;
 import com.tranxactive.j2pay.net.QueryStringHelper;
-
-import java.util.Random;
-
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
+
+import static com.tranxactive.j2pay.gateways.util.ParametersBuilder.buildParameters;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processResponse;
+import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueVaultId;
 
 /**
  * @author Tkhan
@@ -35,7 +33,7 @@ public class EasypayGateway extends Gateway {
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        String customerVaultId = this.getUniqueVaultId();
+        String customerVaultId = getUniqueVaultId();
         String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildPurchaseParameters(apiParameters, customerVaultId, customer, customerCard, currency, amount)));
 
         JSONObject responseObject;
@@ -52,7 +50,7 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getString("response").equals("1")) {
+        if ("1".equals(responseObject.getString("response"))) {
 
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
@@ -79,14 +77,7 @@ public class EasypayGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -108,31 +99,14 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getString("response").equals("1")) {
-            httpResponse.setSuccessful(true);
-            successResponse = new RefundResponse();
-
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
-            successResponse.setAmount(amount);
-
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
-
+        if ("1".equals(responseObject.getString("response"))) {
+            processResponse(responseObject, httpResponse, successResponse, amount);
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -155,7 +129,7 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getString("response").equals("1")) {
+        if ("1".equals(responseObject.getString("response"))) {
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
@@ -179,14 +153,7 @@ public class EasypayGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -208,7 +175,7 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getString("response").equals("1")) {
+        if ("1".equals(responseObject.getString("response"))) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
@@ -220,14 +187,7 @@ public class EasypayGateway extends Gateway {
         }
 
         //final response.
-        if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(successResponse.getResponse().toString());
-        } else {
-            errorResponse.setGatewayResponse(responseObject);
-            httpResponse.setContent(errorResponse.getResponse().toString());
-        }
-
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
 
@@ -283,20 +243,11 @@ public class EasypayGateway extends Gateway {
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-        return new JSONObject()
-                .put("type", "void")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", voidParameters.getString("transactionId"));
+        return buildParameters(apiParameters, voidParameters, null);
     }
 
     private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        return new JSONObject()
-                .put("type", "refund")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", refundParameters.getString("transactionId"))
-                .put("amount", amount);
+        return buildParameters(apiParameters, refundParameters, amount);
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
@@ -306,18 +257,4 @@ public class EasypayGateway extends Gateway {
                 .put("customer_vault_id", rebillParameters.getString("customerVaultId"))
                 .put("amount", amount);
     }
-
-    private String getUniqueVaultId() {
-        String str = "123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-        StringBuilder uniqueString = new StringBuilder(String.valueOf(System.currentTimeMillis()));
-
-        Random random = new Random();
-
-        while (uniqueString.length() < 20) {
-            uniqueString.append(str.charAt(random.nextInt(str.length() - 1)));
-        }
-
-        return uniqueString.toString();
-    }
-
 }
