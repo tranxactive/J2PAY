@@ -9,7 +9,6 @@ import com.tranxactive.j2pay.gateways.core.Gateway;
 import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
-import com.tranxactive.j2pay.gateways.parameters.ParamList;
 import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
 import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
 import com.tranxactive.j2pay.gateways.responses.RefundResponse;
@@ -17,11 +16,14 @@ import com.tranxactive.j2pay.gateways.responses.VoidResponse;
 import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
-import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Response.TRANSACTION_RESULT;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.TRANSACTION_RESULT;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**
  *
@@ -41,7 +43,7 @@ public class PayeezyGateway extends Gateway {
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -49,32 +51,32 @@ public class PayeezyGateway extends Gateway {
 
         if (httpResponse.getContent().trim().startsWith("<")) {
             resp = XMLHelper.toJson(httpResponse.getContent());
-            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Error");
-            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Approved");
+            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_ERROR);
+            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_APPROVED);
 
             if (transactionApproved) {
                 httpResponse.setSuccessful(true);
                 successResponse = new PurchaseResponse();
 
-                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString("Bank_Message"));
-                successResponse.setTransactionId(resp.getJSONObject(TRANSACTION_RESULT).get("Transaction_Tag").toString());
+                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString(BANK_MESSAGE));
+                successResponse.setTransactionId(resp.getJSONObject(TRANSACTION_RESULT).get(TRANSACTION_TAG).toString());
                 successResponse.setAmount(amount);
                 successResponse.setCurrencyCode(currency);
                 successResponse.setCardValuesFrom(customerCard);
 
                 successResponse.setRefundParams(new JSONObject()
-                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                        .put("authorizationNumber", resp.getJSONObject(TRANSACTION_RESULT).get("Authorization_Num").toString())
+                        .put(TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put(J2PAY_AUTHORIZATION_NUMBER, resp.getJSONObject(TRANSACTION_RESULT).get(AUTHORIZATION_NUMBER).toString())
                 );
 
                 successResponse.setVoidParams(new JSONObject()
-                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                        .put("authorizationNumber", resp.getJSONObject(TRANSACTION_RESULT).get("Authorization_Num").toString())
-                        .put(ParamList.AMOUNT.getName(), amount)
+                        .put(TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put(J2PAY_AUTHORIZATION_NUMBER, resp.getJSONObject(TRANSACTION_RESULT).get(AUTHORIZATION_NUMBER).toString())
+                        .put(AMOUNT.getName(), amount)
                 );
 
             } else {
-                errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? EXACT_MESSAGE : BANK_MESSAGE).toString());
             }
 
         } else {
@@ -94,7 +96,7 @@ public class PayeezyGateway extends Gateway {
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -102,25 +104,25 @@ public class PayeezyGateway extends Gateway {
 
         if (httpResponse.getContent().trim().startsWith("<")) {
             resp = XMLHelper.toJson(httpResponse.getContent());
-            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Error");
-            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Approved");
+            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_ERROR);
+            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_APPROVED);
 
             if (transactionApproved) {
                 httpResponse.setSuccessful(true);
                 successResponse = new RefundResponse();
 
-                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString("Bank_Message"));
-                successResponse.setTransactionId(resp.getJSONObject("TransactionResult").get("Transaction_Tag").toString());
+                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString(BANK_MESSAGE));
+                successResponse.setTransactionId(resp.getJSONObject(TRANSACTION_RESULT).get(TRANSACTION_TAG).toString());
                 successResponse.setAmount(amount);
 
                 successResponse.setVoidParams(new JSONObject()
-                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                        .put("authorizationNumber", resp.getJSONObject(TRANSACTION_RESULT).get("Authorization_Num").toString())
-                        .put(ParamList.AMOUNT.getName(), amount)
+                        .put(TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put(J2PAY_AUTHORIZATION_NUMBER, resp.getJSONObject(TRANSACTION_RESULT).get(AUTHORIZATION_NUMBER).toString())
+                        .put(AMOUNT.getName(), amount)
                 );
 
             } else {
-                errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? EXACT_MESSAGE : BANK_MESSAGE).toString());
             }
 
         } else {
@@ -146,7 +148,7 @@ public class PayeezyGateway extends Gateway {
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -154,18 +156,18 @@ public class PayeezyGateway extends Gateway {
 
         if (httpResponse.getContent().trim().startsWith("<")) {
             resp = XMLHelper.toJson(httpResponse.getContent());
-            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Error");
-            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean("Transaction_Approved");
+            boolean transactionError = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_ERROR);
+            boolean transactionApproved = resp.getJSONObject(TRANSACTION_RESULT).getBoolean(TRANSACTION_APPROVED);
 
             if (transactionApproved) {
                 httpResponse.setSuccessful(true);
                 successResponse = new VoidResponse();
 
-                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString("Bank_Message"));
-                successResponse.setTransactionId(resp.getJSONObject(TRANSACTION_RESULT).get("Transaction_Tag").toString());
+                successResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).getString(BANK_MESSAGE));
+                successResponse.setTransactionId(resp.getJSONObject(TRANSACTION_RESULT).get(TRANSACTION_TAG).toString());
 
             } else {
-               errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+               errorResponse.setMessage(resp.getJSONObject(TRANSACTION_RESULT).get(transactionError ? EXACT_MESSAGE : BANK_MESSAGE).toString());
             }
 
         } else {
@@ -180,15 +182,15 @@ public class PayeezyGateway extends Gateway {
     @Override
     public JSONObject getApiSampleParameters() {
         return new JSONObject()
-                .put("exactId", "the gateway id looks like xxxxxx-xx")
-                .put("password", "the gateway api password");
+                .put(EXACT_ID, "the gateway id looks like xxxxxx-xx")
+                .put(PASSWORD, "the gateway api password");
     }
 
     @Override
     public JSONObject getRefundSampleParameters() {
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded")
-                .put("authorizationNumber", "the authorization number provided in purchase transaction");
+                .put(TRANSACTION_ID.getName(), "the transaction id which will be refunded")
+                .put(J2PAY_AUTHORIZATION_NUMBER, "the authorization number provided in purchase transaction");
     }
 
     @Override
@@ -200,9 +202,9 @@ public class PayeezyGateway extends Gateway {
     public JSONObject getVoidSampleParameters() {
 
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded")
-                .put("authorizationNumber", "the authorization number provided in purchase transaction")
-                .put(ParamList.AMOUNT.getName(), "the actual amount of original transaction");
+                .put(TRANSACTION_ID.getName(), "the transaction id which will be refunded")
+                .put(J2PAY_AUTHORIZATION_NUMBER, "the authorization number provided in purchase transaction")
+                .put(AMOUNT.getName(), "the actual amount of original transaction");
 
     }
 
@@ -234,26 +236,14 @@ public class PayeezyGateway extends Gateway {
     }
 
     private String buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        return buildParameters(apiParameters, refundParameters, amount);
+        return buildParameters(TRANSACTION_TYPE_REFUND, apiParameters, refundParameters, Float.toString(amount));
     }
 
     private String buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-        return buildParameters(apiParameters, voidParameters, null);
+        return buildParameters(TRANSACTION_TYPE_VOID, apiParameters, voidParameters, voidParameters.get(TRANSACTION_ID.getName()).toString());
     }
 
-    private String buildParameters(JSONObject apiParameters, JSONObject voidParameters, Float amount) {
-
-        String amountString;
-        String transactionType;
-
-        if (amount != null) {
-            amountString = Float.toString(amount);
-            transactionType = "34";
-        } else {
-            amountString = voidParameters.get(ParamList.TRANSACTION_ID.getName()).toString();
-            transactionType = "33";
-        }
-
+    private String buildParameters(final String transactionType, JSONObject apiParameters, JSONObject voidParameters, String amount) {
         StringBuilder finalParams = new StringBuilder();
 
         finalParams
@@ -262,8 +252,8 @@ public class PayeezyGateway extends Gateway {
                 .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
                 .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
                 .append("<Transaction_Type>" + transactionType + "</Transaction_Type>")
-                .append("<DollarAmount>").append(amountString).append("</DollarAmount>")
-                .append("<Transaction_Tag>").append(voidParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</Transaction_Tag>")
+                .append("<DollarAmount>").append(amount).append("</DollarAmount>")
+                .append("<Transaction_Tag>").append(voidParameters.get(TRANSACTION_ID.getName()).toString()).append("</Transaction_Tag>")
                 .append("<Authorization_Num>").append(voidParameters.get("authorizationNumber").toString()).append("</Authorization_Num>")
                 .append("</Transaction>");
 

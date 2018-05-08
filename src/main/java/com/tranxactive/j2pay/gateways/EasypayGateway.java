@@ -15,18 +15,21 @@ import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.JSONHelper;
 import com.tranxactive.j2pay.net.QueryStringHelper;
-import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Easypay.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Easypay.ResponseParameters.CUSTOMER_VAULT_ID;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Easypay.ResponseParameters.RESPONSE;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Easypay.ResponseParameters.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Easypay.URL;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueVaultId;
+import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 
 /**
  * @author Tkhan
  */
 public class EasypayGateway extends Gateway {
-
-    private final String url = "https://secure.easypaydirectgateway.com/api/transact.php";
 
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
@@ -40,7 +43,7 @@ public class EasypayGateway extends Gateway {
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -48,30 +51,23 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if ("1".equals(responseObject.getString("response"))) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
 
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
+            successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setCardValuesFrom(customerCard);
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
 
-            successResponse.setRebillParams(new JSONObject()
-                    .put("customerVaultId", customerVaultId)
-            );
-
-            successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
+            successResponse.setRebillParams(new JSONObject().put(CUSTOMER_VAULT_ID, customerVaultId));
+            successResponse.setRefundParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
+            successResponse.setVoidParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
 
         } else {
-            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
 
         //final response.
@@ -89,7 +85,7 @@ public class EasypayGateway extends Gateway {
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -97,20 +93,20 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getString("response").equals("1")) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
             httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
+            successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
 
             successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString())
             );
 
         } else {
-            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
 
         //final response.
@@ -129,7 +125,7 @@ public class EasypayGateway extends Gateway {
         RebillResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
@@ -137,27 +133,18 @@ public class EasypayGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if ("1".equals(responseObject.getString("response"))) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
+            successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
-
-            successResponse.setRebillParams(new JSONObject()
-                    .put("customerVaultId", rebillParameters.getString("customerVaultId"))
-            );
-
-            successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
-            );
-
+            successResponse.setRebillParams(new JSONObject().put(CUSTOMER_VAULT_ID, rebillParameters.getString(CUSTOMER_VAULT_ID)));
+            successResponse.setRefundParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
+            successResponse.setVoidParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
         } else {
-            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
 
         //final response.
@@ -176,22 +163,22 @@ public class EasypayGateway extends Gateway {
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if ("1".equals(responseObject.getString("response"))) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
-            successResponse.setMessage(responseObject.getString("responsetext"));
-            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
+            successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
 
         } else {
-            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
 
         //final response.
@@ -201,77 +188,72 @@ public class EasypayGateway extends Gateway {
 
     @Override
     public JSONObject getApiSampleParameters() {
-        return new JSONObject()
-                .put("username", "the user name")
-                .put("password", "merchant password.");
+        return new JSONObject().put(USERNAME, "the user name").put(PASSWORD, "merchant password.");
     }
 
     @Override
     public JSONObject getRefundSampleParameters() {
-        return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
+        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
     }
 
     @Override
     public JSONObject getRebillSampleParameters() {
-        return new JSONObject()
-                .put("customerVaultId", "customer Vault ID required for recurring");
+        return new JSONObject().put(CUSTOMER_VAULT_ID, "customer Vault ID required for recurring");
     }
 
     @Override
     public JSONObject getVoidSampleParameters() {
-        return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
+        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
     }
 
     private JSONObject buildPurchaseParameters(JSONObject apiParameters, String customerVaultId, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
         return new JSONObject()
-                .put("type", "sale")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("ccnumber", customerCard.getNumber())
-                .put("cvv", customerCard.getCvv())
-                .put("ccexp", customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
-                .put("amount", amount)
-                .put("currency", currency)
-                .put("billing_method", "recurring")
-                .put("ipaddress", customer.getIp())
-                .put("first_name", customer.getFirstName())
-                .put("last_name", customer.getLastName())
-                .put("address1", customer.getAddress())
-                .put("city", customer.getCity())
-                .put("state", customer.getState())
-                .put("zip", customer.getZip())
-                .put("country", customer.getCountry().getCodeISO2())
-                .put("phone", customer.getPhoneNumber())
-                .put("email", customer.getEmail())
-                .put("customer_vault", "add_customer")
-                .put("customer_vault_id", customerVaultId);
+                .put(TRANSACTION_TYPE, TRANSACTION_TYPE_PURCHASE)
+                .put(USERNAME, apiParameters.getString(USERNAME))
+                .put(PASSWORD, apiParameters.getString(PASSWORD))
+                .put(CREDIT_CARD_NUMBER, customerCard.getNumber())
+                .put(CREDIT_CARD_CVV, customerCard.getCvv())
+                .put(CREDIT_CARD_EXPIRY_DATE, customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
+                .put(AMOUNT, amount)
+                .put(CURRENCY, currency)
+                .put(BILLING_METHOD, RECURRING)
+                .put(IP_ADDRESS, customer.getIp())
+                .put(FIRSTNAME, customer.getFirstName())
+                .put(LASTNAME, customer.getLastName())
+                .put(ADDRESS, customer.getAddress())
+                .put(CITY, customer.getCity())
+                .put(STATE, customer.getState())
+                .put(ZIPCODE, customer.getZip())
+                .put(COUNTRY, customer.getCountry().getCodeISO2())
+                .put(PHONE_NUMBER, customer.getPhoneNumber())
+                .put(EMAIL, customer.getEmail())
+                .put(CUSTOMER_VAULT, ADD_CUSTOMER)
+                .put(CUSTOMER_VAULT_ID, customerVaultId);
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
         return new JSONObject()
-                .put("type", "void")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", voidParameters.getString("transactionId"));
+                .put(TRANSACTION_TYPE, TRANSACTION_TYPE_VOID)
+                .put(USERNAME, apiParameters.getString(USERNAME))
+                .put(PASSWORD, apiParameters.getString(PASSWORD))
+                .put(TRANSACTION_ID, voidParameters.getString(TRANSACTION_ID));
     }
 
     private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
         return new JSONObject()
-                .put("type", "refund")
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("transactionid", refundParameters.getString("transactionId"))
-                .put("amount", amount);
+                .put(TRANSACTION_TYPE, TRANSACTION_TYPE_REFUND)
+                .put(USERNAME, apiParameters.getString(USERNAME))
+                .put(PASSWORD, apiParameters.getString(PASSWORD))
+                .put(TRANSACTION_ID, refundParameters.getString(TRANSACTION_ID))
+                .put(AMOUNT, amount);
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
         return new JSONObject()
-                .put("username", apiParameters.getString("username"))
-                .put("password", apiParameters.getString("password"))
-                .put("customer_vault_id", rebillParameters.getString("customerVaultId"))
-                .put("amount", amount);
+                .put(USERNAME, apiParameters.getString(USERNAME))
+                .put(PASSWORD, apiParameters.getString(PASSWORD))
+                .put(CUSTOMER_VAULT_ID, rebillParameters.getString(CUSTOMER_VAULT_ID))
+                .put(AMOUNT, amount);
     }
 }

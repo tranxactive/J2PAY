@@ -8,9 +8,9 @@ package com.tranxactive.j2pay.net;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.util.logging.Level;
 
 import static com.tranxactive.j2pay.gateways.parameters.Constants.ENCODING_UTF8;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -18,7 +18,9 @@ import static java.util.logging.Logger.getLogger;
  * @author ilyas
  */
 public class StringHelper {
-    
+
+    private StringHelper() {
+    }
     /**
      * This method encodes the string.
      * @param str the string that will be encoded.
@@ -29,7 +31,7 @@ public class StringHelper {
         try {
             return URLEncoder.encode(str, ENCODING_UTF8);
         } catch (UnsupportedEncodingException ex) {
-            getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
+            getLogger(StringHelper.class.getName()).log(SEVERE, null, ex);
             return null;
         }
     }
@@ -44,7 +46,7 @@ public class StringHelper {
         try {
             return URLDecoder.decode(str, ENCODING_UTF8);
         } catch (UnsupportedEncodingException ex) {
-            getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
+            getLogger(StringHelper.class.getName()).log(SEVERE, null, ex);
             return null;
         }
     }

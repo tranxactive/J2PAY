@@ -12,19 +12,24 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
 
+import static java.lang.System.currentTimeMillis;
 import static org.apache.http.entity.ContentType.create;
+import static org.apache.http.impl.client.HttpClients.createDefault;
 
 /**
  *
  * @author ilyas
  */
 public class HTTPClient {
+
+    private HTTPClient() {
+    }
+
 
     /**
      * This method is the wrapper of apache http client get request.
@@ -40,11 +45,11 @@ public class HTTPClient {
 
         HTTPResponse hTTPResponse;
         long startTime, endTime;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        try (CloseableHttpClient httpClient = createDefault()) {
             HttpGet httpGet = new HttpGet(url);
-            startTime = System.currentTimeMillis();
+            startTime = currentTimeMillis();
             CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpGet);
-            endTime = System.currentTimeMillis();
+            endTime = currentTimeMillis();
             hTTPResponse = new HTTPResponse(closeableHttpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(closeableHttpResponse.getEntity()), endTime - startTime);
             EntityUtils.consume(closeableHttpResponse.getEntity());
         }
@@ -69,23 +74,23 @@ public class HTTPClient {
 
         HTTPResponse hTTPResponse;
 
-        long startTime = System.currentTimeMillis(), endTime;
-        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+        long startTime = currentTimeMillis(), endTime;
+        try (CloseableHttpClient httpClient = createDefault()) {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(postParams));
             httpPost.addHeader("Content-Type", charset == null ? contentType.toString() : create(contentType.getMimeType(), charset).toString());
 
-            startTime = System.currentTimeMillis();
+            startTime = currentTimeMillis();
 
             CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpPost);
 
-            endTime = System.currentTimeMillis();
+            endTime = currentTimeMillis();
 
             hTTPResponse = new HTTPResponse(closeableHttpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(closeableHttpResponse.getEntity()).replaceFirst("^\uFEFF", ""), endTime - startTime);
             hTTPResponse.setRequestString(postParams);
             EntityUtils.consume(closeableHttpResponse.getEntity());
         } catch (IOException e) {
-            return new HTTPResponse(-1, new ErrorResponse("could not connect to host", null).getResponse().toString(), System.currentTimeMillis() - startTime);
+            return new HTTPResponse(-1, new ErrorResponse("could not connect to host", null).getResponse().toString(), currentTimeMillis() - startTime);
         }
         return hTTPResponse;
 

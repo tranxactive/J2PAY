@@ -5,8 +5,9 @@
  */
 package com.tranxactive.j2pay.net;
 
-import java.util.Iterator;
 import org.json.JSONObject;
+
+import java.util.Iterator;
 
 /**
  *
@@ -14,6 +15,8 @@ import org.json.JSONObject;
  */
 public class QueryStringHelper {
 
+    private QueryStringHelper() {
+    }
     /**
      * <p>
      * This method converts JSONObject to query string. Do not use this method

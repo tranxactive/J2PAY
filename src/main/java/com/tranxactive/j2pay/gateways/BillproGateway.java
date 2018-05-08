@@ -6,27 +6,27 @@
 package com.tranxactive.j2pay.gateways;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
+import com.tranxactive.j2pay.gateways.parameters.Constants;
 import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
-import com.tranxactive.j2pay.gateways.parameters.ParamList;
 import com.tranxactive.j2pay.gateways.responses.*;
-import com.tranxactive.j2pay.net.HTTPClient;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
-import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Response.RESPONSE;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.URL;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
+import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**
  * @author tkhan
  */
 public class BillproGateway extends Gateway {
-
-    private final String url = "https://gateway.billpro.com";
 
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
@@ -40,40 +40,33 @@ public class BillproGateway extends Gateway {
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = httpPost(URL, requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt(RESPONSE_CODE);
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
-            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
             successResponse.setCardValuesFrom(customerCard);
 
             successResponse.setRebillParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                    .put("Reference", reference)
+                    .put(TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                    .put(REFERENCE, reference)
             );
-
-            successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-            );
-
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-            );
-
+            successResponse.setRefundParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
+            successResponse.setVoidParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
         } else {
-            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get(DESCRIPTION).toString());
         }
 
         //final response.
@@ -91,29 +84,26 @@ public class BillproGateway extends Gateway {
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = httpPost(URL, requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt(RESPONSE_CODE);
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
-            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
-
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-            );
+            successResponse.setVoidParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
 
         } else {
-            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get(DESCRIPTION).toString());
         }
 
         //final response.
@@ -133,39 +123,33 @@ public class BillproGateway extends Gateway {
 
         String requestString = this.buildRebillParameters(apiParameters, rebillParameters, amount);
 
-        httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_XML);
+        httpResponse = httpPost(URL, requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt(RESPONSE_CODE);
 
         if (result == 100) {
 
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
-            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
 
             successResponse.setRebillParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-                    .put("Reference", rebillParameters.getString("Reference"))
+                    .put(TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                    .put(REFERENCE, rebillParameters.getString(REFERENCE))
             );
 
-            successResponse.setRefundParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-            );
-
-            successResponse.setVoidParams(new JSONObject()
-                    .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
-            );
-
+            successResponse.setRefundParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
+            successResponse.setVoidParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
         } else {
-            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get(DESCRIPTION).toString());
         }
 
         //final response.
@@ -183,24 +167,23 @@ public class BillproGateway extends Gateway {
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        HTTPResponse httpResponse = HTTPClient.httpPost(url, requestString, ContentType.APPLICATION_XML);
+        HTTPResponse httpResponse = httpPost(URL, requestString, APPLICATION_XML);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt(RESPONSE_CODE);
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
-            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
-
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
         } else {
-            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get(DESCRIPTION).toString());
         }
 
         //final response.
@@ -211,28 +194,26 @@ public class BillproGateway extends Gateway {
     @Override
     public JSONObject getApiSampleParameters() {
         return new JSONObject()
-                .put("AccountID", "the gateway Account id")
-                .put("AccountAuth", "the gateway alpha-numeric Auth");
+                .put(ACCOUNT_ID, "the gateway Account id")
+                .put(ACCOUNT_AUTHORIZATION, "the gateway alpha-numeric Auth");
     }
 
     @Override
     public JSONObject getRefundSampleParameters() {
-        return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded");
+        return new JSONObject().put(TRANSACTION_ID.getName(), "the transaction id which will be refunded");
     }
 
     @Override
     public JSONObject getRebillSampleParameters() {
         return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id of last successfull charge")
-                .put("Reference", "reference of last successfull charge transaction");
+                .put(TRANSACTION_ID.getName(), "the transaction id of last successfull charge")
+                .put(REFERENCE, "reference of last successfull charge transaction");
     }
 
     @Override
     public JSONObject getVoidSampleParameters() {
 
-        return new JSONObject()
-                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded");
+        return new JSONObject().put(TRANSACTION_ID.getName(), "the transaction id which will be refunded");
 
     }
 
@@ -244,8 +225,8 @@ public class BillproGateway extends Gateway {
         finalParams
                 .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
                 .append("<Request type='AuthorizeCapture'>")
-                .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
+                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
+                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
                 .append("<Transaction>")
                 .append("<Reference>").append(reference).append("</Reference>")
                 .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
@@ -278,11 +259,11 @@ public class BillproGateway extends Gateway {
         finalParams
                 .append("<?xml version='1.0' encoding='UTF-8'?>")
                 .append("<Request type='Refund'>")
-                .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
+                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
+                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
                 .append("<Transaction>")
                 .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
-                .append("<TransactionID>").append(refundParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
+                .append("<TransactionID>").append(refundParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
                 .append("</Transaction>")
                 .append("</Request>");
 
@@ -297,10 +278,10 @@ public class BillproGateway extends Gateway {
         finalParams
                 .append("<?xml version='1.0' encoding='UTF-8'?>")
                 .append("<Request type='Void'>")
-                .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
+                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
+                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
                 .append("<Transaction>")
-                .append("<TransactionID>").append(voidParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
+                .append("<TransactionID>").append(voidParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
                 .append("</Transaction>")
                 .append("</Request>");
 
@@ -314,12 +295,12 @@ public class BillproGateway extends Gateway {
         finalParams
                 .append("<?xml version='1.0' encoding='utf-8'?>")
                 .append("<Request type='Recur'>")
-                .append("<AccountID>").append(apiParameters.getString("AccountID")).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString("AccountAuth")).append("</AccountAuth>")
+                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
+                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
                 .append("<Transaction>")
-                .append("<Reference>").append(rebillParameters.getString("Reference")).append("</Reference>")
+                .append("<Reference>").append(rebillParameters.getString(REFERENCE)).append("</Reference>")
                 .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
-                .append("<TransactionID>").append(rebillParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
+                .append("<TransactionID>").append(rebillParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
                 .append("</Transaction>")
                 .append("</Request>");
 

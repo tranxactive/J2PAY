@@ -14,6 +14,8 @@ import org.json.XML;
  */
 public class XMLHelper {
 
+    private XMLHelper() {
+    }
     /**
      * This method converts xml into JSONObject.
      *

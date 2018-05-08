@@ -12,9 +12,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.Iterator;
-import java.util.logging.Level;
 
 import static com.tranxactive.j2pay.gateways.parameters.Constants.ENCODING_UTF8;
+import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -22,6 +22,10 @@ import static java.util.logging.Logger.getLogger;
  * @author ilyas
  */
 public class JSONHelper {
+
+    private JSONHelper(){
+        
+    }
 
     /**
      * This method encodes JSONObject.
@@ -50,7 +54,7 @@ public class JSONHelper {
                     finalJSONObject.put(key, object.get(key));
                 }
             } catch (UnsupportedEncodingException ex) {
-                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(SEVERE, null, ex);
                 return null;
             }
         }
@@ -80,7 +84,7 @@ public class JSONHelper {
                     finalJSONArray.put(object);
                 }
             } catch (UnsupportedEncodingException ex) {
-                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(SEVERE, null, ex);
                 return null;
             }
         }
@@ -116,7 +120,7 @@ public class JSONHelper {
                     finalJSONObject.put(key, object.get(key));
                 }
             } catch (UnsupportedEncodingException ex) {
-                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(SEVERE, null, ex);
                 return null;
             }
         }
@@ -146,7 +150,7 @@ public class JSONHelper {
                     finalJSONArray.put(object);
                 }
             } catch (UnsupportedEncodingException ex) {
-                getLogger(JSONHelper.class.getName()).log(Level.SEVERE, null, ex);
+                getLogger(JSONHelper.class.getName()).log(SEVERE, null, ex);
                 return null;
             }
         }
