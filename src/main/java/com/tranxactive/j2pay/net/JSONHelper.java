@@ -14,6 +14,7 @@ import java.net.URLEncoder;
 import java.util.Iterator;
 import java.util.logging.Level;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.ENCODING_UTF8;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -40,7 +41,7 @@ public class JSONHelper {
 
             try {
                 if (object.get(key) instanceof String) {
-                    finalJSONObject.put(key, URLEncoder.encode(object.getString(key), "UTF-8"));
+                    finalJSONObject.put(key, URLEncoder.encode(object.getString(key), ENCODING_UTF8));
                 } else if (object.get(key) instanceof JSONObject) {
                     finalJSONObject.put(key, encode(object.getJSONObject(key)));
                 } else if (object.get(key) instanceof JSONArray) {
@@ -70,7 +71,7 @@ public class JSONHelper {
         for (Object object : arr) {
             try {
                 if (object instanceof String) {
-                    finalJSONArray.put(URLEncoder.encode(String.valueOf(object), "UTF-8"));
+                    finalJSONArray.put(URLEncoder.encode(String.valueOf(object), ENCODING_UTF8));
                 } else if (object instanceof JSONObject) {
                     finalJSONArray.put(encode((JSONObject) object));
                 } else if (object instanceof JSONArray) {
@@ -106,7 +107,7 @@ public class JSONHelper {
 
             try {
                 if (object.get(key) instanceof String) {
-                    finalJSONObject.put(key, URLDecoder.decode(object.getString(key), "UTF-8"));
+                    finalJSONObject.put(key, URLDecoder.decode(object.getString(key), ENCODING_UTF8));
                 } else if (object.get(key) instanceof JSONObject) {
                     finalJSONObject.put(key, decode(object.getJSONObject(key)));
                 } else if (object.get(key) instanceof JSONArray) {
@@ -136,7 +137,7 @@ public class JSONHelper {
         for (Object object : arr) {
             try {
                 if (object instanceof String) {
-                    finalJSONArray.put(URLDecoder.decode(String.valueOf(object), "UTF-8"));
+                    finalJSONArray.put(URLDecoder.decode(String.valueOf(object), ENCODING_UTF8));
                 } else if (object instanceof JSONObject) {
                     finalJSONArray.put(decode((JSONObject) object));
                 } else if (object instanceof JSONArray) {

@@ -10,6 +10,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.logging.Level;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.ENCODING_UTF8;
 import static java.util.logging.Logger.getLogger;
 
 /**
@@ -26,7 +27,7 @@ public class StringHelper {
     public static String encode(String str){
     
         try {
-            return URLEncoder.encode(str, "UTF-8");
+            return URLEncoder.encode(str, ENCODING_UTF8);
         } catch (UnsupportedEncodingException ex) {
             getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
             return null;
@@ -41,7 +42,7 @@ public class StringHelper {
     public static String decode(String str){
     
         try {
-            return URLDecoder.decode(str, "UTF-8");
+            return URLDecoder.decode(str, ENCODING_UTF8);
         } catch (UnsupportedEncodingException ex) {
             getLogger(StringHelper.class.getName()).log(Level.SEVERE, null, ex);
             return null;

@@ -17,6 +17,7 @@ import com.tranxactive.j2pay.net.XMLHelper;
 import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Response.RESPONSE;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
 
@@ -46,14 +47,14 @@ public class BillproGateway extends Gateway {
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject("Response").getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
-            successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject("Response").get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
             successResponse.setCardValuesFrom(customerCard);
@@ -72,7 +73,7 @@ public class BillproGateway extends Gateway {
             );
 
         } else {
-            errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
         }
 
         //final response.
@@ -97,14 +98,14 @@ public class BillproGateway extends Gateway {
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject("Response").getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
-            successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject("Response").get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
             successResponse.setAmount(amount);
 
             successResponse.setVoidParams(new JSONObject()
@@ -112,7 +113,7 @@ public class BillproGateway extends Gateway {
             );
 
         } else {
-            errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
         }
 
         //final response.
@@ -139,15 +140,15 @@ public class BillproGateway extends Gateway {
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject("Response").getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
 
         if (result == 100) {
 
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
-            successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject("Response").get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
             successResponse.setAmount(amount);
 
             successResponse.setRebillParams(new JSONObject()
@@ -164,7 +165,7 @@ public class BillproGateway extends Gateway {
             );
 
         } else {
-            errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
         }
 
         //final response.
@@ -189,17 +190,17 @@ public class BillproGateway extends Gateway {
         }
 
         resp = XMLHelper.toJson(httpResponse.getContent());
-        result = resp.getJSONObject("Response").getInt("ResponseCode");
+        result = resp.getJSONObject(RESPONSE).getInt("ResponseCode");
 
         if (result == 100) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
-            successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
-            successResponse.setTransactionId(resp.getJSONObject("Response").get("TransactionID").toString());
+            successResponse.setMessage(resp.getJSONObject(RESPONSE).getString("Description"));
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get("TransactionID").toString());
 
         } else {
-            errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setMessage(resp.getJSONObject(RESPONSE).get("Description").toString());
         }
 
         //final response.

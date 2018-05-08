@@ -16,9 +16,11 @@ import com.tranxactive.j2pay.net.JSONHelper;
 import com.tranxactive.j2pay.net.QueryStringHelper;
 import org.json.JSONObject;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Response.RESULT;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static com.tranxactive.j2pay.net.QueryStringHelper.toQueryString;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 
 /**
@@ -30,7 +32,7 @@ public class PayflowProGateway extends Gateway {
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount)));
+        String requestString = toQueryString(JSONHelper.encode(this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
 
@@ -45,7 +47,7 @@ public class PayflowProGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt("RESULT") == 0) {
+        if (responseObject.getInt(RESULT) == 0) {
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
@@ -73,7 +75,7 @@ public class PayflowProGateway extends Gateway {
 
     @Override
     public HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildRefundParameters(apiParameters, refundParameters, amount)));
+        String requestString = toQueryString(JSONHelper.encode(this.buildRefundParameters(apiParameters, refundParameters, amount)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
 
@@ -88,7 +90,7 @@ public class PayflowProGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt("RESULT") == 0) {
+        if (responseObject.getInt(RESULT) == 0) {
             httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
@@ -112,7 +114,7 @@ public class PayflowProGateway extends Gateway {
     @Override
     public HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
         
-        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildRebillParameters(apiParameters, rebillParameters, amount)));
+        String requestString = toQueryString(JSONHelper.encode(this.buildRebillParameters(apiParameters, rebillParameters, amount)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
 
@@ -127,7 +129,7 @@ public class PayflowProGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt("RESULT") == 0) {
+        if (responseObject.getInt(RESULT) == 0) {
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
@@ -158,7 +160,7 @@ public class PayflowProGateway extends Gateway {
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
         
-        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildVoidParameters(apiParameters, voidParameters)));
+        String requestString = toQueryString(JSONHelper.encode(this.buildVoidParameters(apiParameters, voidParameters)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
 
@@ -173,7 +175,7 @@ public class PayflowProGateway extends Gateway {
 
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt("RESULT") == 0) {
+        if (responseObject.getInt(RESULT) == 0) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
