@@ -10,12 +10,22 @@ public class Constants {
 
 			public final class RequestParameters {
 				public static final String TRANSACTION_KEY = "transactionKey";
-				public static final String TRANSACTION_TYPE_PURCHASE = "authCaptureTransaction";
-				public static final String TRANSACTION_TYPE_REBILL = "authCaptureTransaction";
 				public static final String CUSTOMER_PROFILE_ID = "customerProfileId";
 				public static final String PAYMENT_PROFILE_ID = "paymentProfileId";
-				public static final String TRANSACTION_TYPE_REFUND = "refundTransaction";
-				public static final String TRANSACTION_TYPE_VOID = "voidTransaction";
+				public static final String CREDIT_CARD_NUMBER = "creditCardNumber";
+				public static final String CREDIT_CARD_EXPIRATION_DATE = "creditCardExpirationDate";
+				public static final String CREDIT_CARD_CVV = "creditCardCvv";
+				public static final String UNIQUE_CUSTOMER_ID = "uniqueCustomerId";
+				public static final String EMAIL_ADDRESS = "emailAddress";
+				public static final String FIRSTNAME = "firstName";
+				public static final String LASTNAME = "lastName";
+				public static final String ADDRESS = "address";
+				public static final String CITY = "city";
+				public static final String STATE = "state";
+				public static final String ZIPCODE = "zipcode";
+				public static final String COUNTRY = "country";
+				public static final String PHONE_NUMBER = "phoneNumber";
+				public static final String IP_ADDRESS = "ipAddress";
 			}
 			public final class ResponseParameters {
 				public static final String NAME = "name";
@@ -40,6 +50,26 @@ public class Constants {
 
 		public final class Billpro {
 			public static final String URL = "https://gateway.billpro.com";
+
+			public final class RequestParameters {
+                public static final String REFERENCE = "Reference";
+				public static final String AMOUNT = "amount";
+				public static final String CURRENCY = "currency";
+				public static final String EMAIL_ADDRESS = "emailAddress";
+				public static final String IP_ADDRESS = "ipAddress";
+				public static final String PHONE_NUMBER = "phoneNumber";
+				public static final String FIRSTNAME = "firstName";
+				public static final String LASTNAME = "lastName";
+				public static final String ADDRESS = "address";
+				public static final String CITY = "city";
+				public static final String STATE = "state";
+				public static final String ZIPCODE = "zipcode";
+				public static final String COUNTRY = "country";
+				public static final String CREDIT_CARD_NUMBER = "ccnumber";
+				public static final String CREDIT_CARD_EXPIRY_MONTH = "expiryMonth";
+				public static final String CREDIT_CARD_EXPIRY_YEAR = "expiryYear";
+				public static final String CREDIT_CARD_CVV = "cvv";
+			}
 
 			public final class ResponseParameters {
 				public static final String RESPONSE = "Response";
@@ -129,14 +159,17 @@ public class Constants {
 
 		public final class Payeezy {
 			public static final String TRANSACTION_RESULT = "TransactionResult";
+			public static final String TEST_URL = "https://api.demo.globalgatewaye4.firstdata.com/transaction/v11";
+			public static final String LIVE_URL = "https://api.globalgatewaye4.firstdata.com/transaction/v11";
 
-			public final class ResponseParameters {
+			public final class RequestParameters {
+			}
+
+				public final class ResponseParameters {
 				public static final String TRANSACTION_ERROR = "Transaction_Error";
 				public static final String TRANSACTION_APPROVED = "Transaction_Approved";
 				public static final String BANK_MESSAGE = "Bank_Message";
 				public static final String TRANSACTION_TAG = "Transaction_Tag";
-				public static final String TRANSACTION_TYPE_REFUND = "34";
-				public static final String TRANSACTION_TYPE_VOID = "33";
 				public static final String AUTHORIZATION_NUMBER = "Authorization_Num";
 				public static final String J2PAY_AUTHORIZATION_NUMBER = "authorizationNumber";
 				public static final String EXACT_MESSAGE = "EXact_Message";
@@ -147,6 +180,10 @@ public class Constants {
 
 		public final class PayflowPro {
 			public static final String RESULT = "RESULT";
+
+			public static final String TEST_URL = "https://pilot-payflowpro.paypal.com";
+			public static final String LIVE_URL = "https://payflowpro.paypal.com";
+
 			public final class ResponseParameters {
 				public static final String MESSAGE = "RESPMSG";
 				public static final String PNREF = "PNREF";

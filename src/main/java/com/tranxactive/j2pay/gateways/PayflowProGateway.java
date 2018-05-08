@@ -14,9 +14,11 @@ import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.QueryStringHelper;
 import org.json.JSONObject;
 
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.LIVE_URL;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.RESULT;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.RequestParameters.*;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.TEST_URL;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
@@ -279,8 +281,9 @@ public class PayflowProGateway extends Gateway {
                 .put(RECURRING, "Y");
     }
 
+
     private String getApiURL() {
-            return "https://" + (this.isTestMode() ? "pilot-" : "") + "payflowpro.paypal.com";
+        return isTestMode() ? TEST_URL : LIVE_URL;
     }
 
 }

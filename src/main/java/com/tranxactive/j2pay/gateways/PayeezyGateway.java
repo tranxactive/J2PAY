@@ -18,10 +18,17 @@ import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.ResponseParameters.NAME;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.LIVE_URL;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.TEST_URL;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.TRANSACTION_RESULT;
-import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
-import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.*;
+import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
@@ -210,60 +217,45 @@ public class PayeezyGateway extends Gateway {
 
     //private methods are starting below.
     private String buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(EXACT_ID, apiParameters.getString(NAME));
+	    input.put(PASSWORD, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put("CURRENCY", currency);
+	    input.put("cardholder", customerCard.getName());
+	    input.put("creditCardNumber", apiParameters.getString(NAME));
+	    input.put("creditCardCvv", apiParameters.getString(NAME));
+	    input.put("creditCardExpiryDate", apiParameters.getString(NAME));
+	    input.put("ipAddress", customer.getIp());
+	    input.put("emailAddress", customer.getEmail());
+	    input.put("verification", customer.getAddress() + "|" + customer.getZip() + "|" + customer.getCity() + "|" + customer.getState() + "|" + customer.getCountry().getCodeISO2());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-                .append("<Transaction>")
-                .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
-                .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
-                .append("<Transaction_Type>00</Transaction_Type>")
-                .append("<DollarAmount>").append(Float.toString(amount)).append("</DollarAmount>")
-                .append("<Currency>").append(currency).append("</Currency>")
-                .append("<CardHoldersName>").append(customerCard.getName()).append("</CardHoldersName>")
-                .append("<Card_Number>").append(customerCard.getNumber()).append("</Card_Number>")
-                .append("<VerificationStr2>").append(customerCard.getCvv()).append("</VerificationStr2>")
-                .append("<CVD_Presence_Ind>1</CVD_Presence_Ind>")
-                .append("<Expiry_Date>").append(customerCard.getExpiryMonth()).append(customerCard.getExpiryYear().substring(2)).append("</Expiry_Date>")
-                .append("<Client_IP>").append(customer.getIp()).append("</Client_IP>")
-                .append("<Client_Email>").append(customer.getEmail()).append("</Client_Email>")
-                .append("<VerificationStr1>").append(customer.getAddress()).append("|").append(customer.getZip()).append("|").append(customer.getCity()).append("|").append(customer.getState()).append("|").append(customer.getCountry().getCodeISO2()).append("</VerificationStr1>")
-                .append("</Transaction>");
-
-        return finalParams.toString();
+	    return createRequest(input, "Payeezy/PurchaseRRequest.ftl");
 
     }
 
     private String buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
-        return buildParameters(TRANSACTION_TYPE_REFUND, apiParameters, refundParameters, Float.toString(amount));
+        final Map<String, Object> input = new HashMap<>();
+        input.put(EXACT_ID, apiParameters.getString(NAME));
+        input.put(PASSWORD, apiParameters.getString(TRANSACTION_KEY));
+        input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(TRANSACTION_ID.getName(), refundParameters.get(TRANSACTION_ID.getName()).toString());
+        input.put("authorizationNumber", refundParameters.get("authorizationNumber").toString());
+
+        return createRequest(input, "Payeezy/RefundRequest.ftl");
     }
 
     private String buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-        return buildParameters(TRANSACTION_TYPE_VOID, apiParameters, voidParameters, voidParameters.get(TRANSACTION_ID.getName()).toString());
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(EXACT_ID, apiParameters.getString(NAME));
+	    input.put(PASSWORD, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(TRANSACTION_ID.getName(), voidParameters.get(TRANSACTION_ID.getName()).toString());
+	    input.put("authorizationNumber", voidParameters.get("authorizationNumber").toString());
+
+	    return createRequest(input, "Payeezy/VoidRequest.ftl");
     }
-
-    private String buildParameters(final String transactionType, JSONObject apiParameters, JSONObject voidParameters, String amount) {
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-                .append("<Transaction>")
-                .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
-                .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
-                .append("<Transaction_Type>" + transactionType + "</Transaction_Type>")
-                .append("<DollarAmount>").append(amount).append("</DollarAmount>")
-                .append("<Transaction_Tag>").append(voidParameters.get(TRANSACTION_ID.getName()).toString()).append("</Transaction_Tag>")
-                .append("<Authorization_Num>").append(voidParameters.get("authorizationNumber").toString()).append("</Authorization_Num>")
-                .append("</Transaction>");
-
-        return finalParams.toString();
-    }
-
-
 
     private String getApiURL() {
-        return "https://api." + (isTestMode()? "demo." : "") + "globalgatewaye4.firstdata.com/transaction/v11";
+    	return isTestMode() ? TEST_URL : LIVE_URL;
     }
-
 }

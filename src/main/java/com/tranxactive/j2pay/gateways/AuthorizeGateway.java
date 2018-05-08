@@ -12,15 +12,17 @@ import com.tranxactive.j2pay.gateways.responses.*;
 import com.tranxactive.j2pay.net.HTTPResponse;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.LIVE_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.CUSTOMER_PROFILE_ID;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.PAYMENT_PROFILE_ID;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.TRANSACTION_KEY;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.*;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.ResponseParameters.*;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.TEST_URL;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.CARD_LAST_4;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
 import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
@@ -289,120 +291,59 @@ public class AuthorizeGateway extends Gateway {
 
     //private methods are starting below.
     private String buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(NAME, apiParameters.getString(NAME));
+	    input.put(TRANSACTION_KEY, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(CREDIT_CARD_NUMBER, customerCard.getNumber());
+	    input.put(CREDIT_CARD_EXPIRATION_DATE, customerCard.getExpiryMonth() + "" + customerCard.getExpiryYear().substring(2));
+	    input.put(CREDIT_CARD_CVV, customerCard.getCvv());
+	    input.put(UNIQUE_CUSTOMER_ID, getUniqueCustomerId());
+	    input.put(EMAIL_ADDRESS, customer.getEmail());
+	    input.put(FIRSTNAME, customer.getFirstName());
+	    input.put(LASTNAME, customer.getLastName());
+	    input.put(ADDRESS, customer.getAddress());
+	    input.put(CITY, customer.getCity());
+	    input.put(STATE, customer.getState());
+	    input.put(ZIPCODE, customer.getZip());
+	    input.put(COUNTRY, customer.getCountry().getCodeISO3());
+	    input.put(PHONE_NUMBER, customer.getPhoneNumber());
+	    input.put(IP_ADDRESS, customer.getIp());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
-                .append("<merchantAuthentication>")
-                .append("<name>").append(apiParameters.getString(NAME)).append("</name>")
-                .append("<transactionKey>").append(apiParameters.getString(TRANSACTION_KEY)).append("</transactionKey>")
-                .append("</merchantAuthentication>")
-                .append("<transactionRequest>")
-                .append("<transactionType>").append(TRANSACTION_TYPE_PURCHASE).append("</transactionType>")
-                .append("<amount>").append(Float.toString(amount)).append("</amount>")
-                .append("<payment>")
-                .append("<creditCard>")
-                .append("<cardNumber>").append(customerCard.getNumber()).append("</cardNumber>")
-                .append("<expirationDate>").append(customerCard.getExpiryMonth()).append(customerCard.getExpiryYear().substring(2)).append("</expirationDate>")
-                .append("<cardCode>").append(customerCard.getCvv()).append("</cardCode>")
-                .append("</creditCard>")
-                .append("</payment>")
-                .append("<profile>")
-                .append("<createProfile>").append(true).append("</createProfile>")
-                .append("</profile>")
-                .append("<customer>")
-                .append("<id>").append(getUniqueCustomerId()).append("</id>")
-                .append("<email>").append(customer.getEmail()).append("</email>")
-                .append("</customer>")
-                .append("<billTo>")
-                .append("<firstName>").append(customer.getFirstName()).append("</firstName>")
-                .append("<lastName>").append(customer.getLastName()).append("</lastName>")
-                .append("<address>").append(customer.getAddress()).append("</address>")
-                .append("<city>").append(customer.getCity()).append("</city>")
-                .append("<state>").append(customer.getState()).append("</state>")
-                .append("<zip>").append(customer.getZip()).append("</zip>")
-                .append("<country>").append(customer.getCountry().getCodeISO3()).append("</country>")
-                .append("<phoneNumber>").append(customer.getPhoneNumber()).append("</phoneNumber>")
-                .append("</billTo>")
-                .append("<customerIP>").append(customer.getIp()).append("</customerIP>")
-                .append("</transactionRequest>")
-                .append("</createTransactionRequest>");
-
-        return finalParams.toString();
-
+	    return createRequest(input, "Authorize/PurchaseRequest.ftl");
     }
 
     private String buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(NAME, apiParameters.getString(NAME));
+	    input.put(TRANSACTION_KEY, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(TRANSACTION_ID.getName(), refundParameters.getString(TRANSACTION_ID.getName()));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(CREDIT_CARD_NUMBER, refundParameters.getString(CARD_LAST_4.getName()));
+	    input.put(CREDIT_CARD_EXPIRATION_DATE, "XXXX"); // refundParameters.getString(ParamList.CARD_EXPIRY_MONTH.getName())).append(refundParameters.getString(ParamList.CARD_EXPIRY_YEAR.getName()).substring(2)
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
-                .append("<merchantAuthentication>")
-                .append("<name>").append(apiParameters.getString(NAME)).append("</name>")
-                .append("<transactionKey>").append(apiParameters.getString(TRANSACTION_KEY)).append("</transactionKey>")
-                .append("</merchantAuthentication>")
-                .append("<transactionRequest>")
-                .append("<transactionType>").append(TRANSACTION_TYPE_REFUND).append("</transactionType>")
-                .append("<amount>").append(Float.toString(amount)).append("</amount>")
-                .append("<payment>")
-                .append("<creditCard>")
-                .append("<cardNumber>").append(refundParameters.getString(CARD_LAST_4.getName())).append("</cardNumber>")
-                .append("<expirationDate>XXXX")/*.append(refundParameters.getString(ParamList.CARD_EXPIRY_MONTH.getName())).append(refundParameters.getString(ParamList.CARD_EXPIRY_YEAR.getName()).substring(2))*/
-                .append("</expirationDate>")
-                .append("</creditCard>")
-                .append("</payment>")
-                .append("<refTransId>").append(refundParameters.getString(TRANSACTION_ID.getName())).append("</refTransId>")
-                .append("</transactionRequest>")
-                .append("</createTransactionRequest>");
-
-        return finalParams.toString();
-
+	    return createRequest(input, "Authorize/RefundRequest.ftl");
     }
 
     private String buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(NAME, apiParameters.getString(NAME));
+	    input.put(TRANSACTION_KEY, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(TRANSACTION_ID.getName(), voidParameters.getString(TRANSACTION_ID.getName()));
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
-                .append("<merchantAuthentication>")
-                .append("<name>").append(apiParameters.getString(NAME)).append("</name>")
-                .append("<transactionKey>").append(apiParameters.getString(TRANSACTION_KEY)).append("</transactionKey>")
-                .append("</merchantAuthentication>")
-                .append("<transactionRequest>")
-                .append("<transactionType>").append(TRANSACTION_TYPE_VOID).append("</transactionType>")
-                .append("<refTransId>").append(voidParameters.getString(TRANSACTION_ID.getName())).append("</refTransId>")
-                .append("</transactionRequest>")
-                .append("</createTransactionRequest>");
-
-        return finalParams.toString();
+	    return createRequest(input, "Authorize/VoidRequest.ftl");
     }
 
     private String buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(NAME, apiParameters.getString(NAME));
+	    input.put(TRANSACTION_KEY, apiParameters.getString(TRANSACTION_KEY));
+	    input.put(TRANSACTION_ID.getName(), rebillParameters.getString(TRANSACTION_ID.getName()));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(CUSTOMER_PROFILE_ID, rebillParameters.getString(CUSTOMER_PROFILE_ID));
+	    input.put(PAYMENT_PROFILE_ID, rebillParameters.getString(PAYMENT_PROFILE_ID));
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
-                .append("<merchantAuthentication>")
-                .append("<name>").append(apiParameters.getString(NAME)).append("</name>")
-                .append("<transactionKey>").append(apiParameters.getString(TRANSACTION_KEY)).append("</transactionKey>")
-                .append("</merchantAuthentication>")
-                .append("<transactionRequest>")
-                .append("<transactionType>").append(TRANSACTION_TYPE_REBILL).append("</transactionType>")
-                .append("<amount>").append(Float.toString(amount)).append("</amount>")
-                .append("<profile>")
-                .append("<customerProfileId>").append(rebillParameters.getString(CUSTOMER_PROFILE_ID)).append("</customerProfileId>")
-                .append("<paymentProfile>")
-                .append("<paymentProfileId>").append(rebillParameters.getString(PAYMENT_PROFILE_ID)).append("</paymentProfileId>")
-                .append("</paymentProfile>")
-                .append("</profile>")
-                .append("</transactionRequest>")
-                .append("</createTransactionRequest>");
-
-        return finalParams.toString();
+	    return createRequest(input, "Authorize/RebillRequest.ftl");
     }
 
     private String getApiURL() {

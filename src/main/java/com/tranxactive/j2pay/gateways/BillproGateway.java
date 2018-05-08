@@ -15,9 +15,16 @@ import com.tranxactive.j2pay.net.HTTPResponse;
 import com.tranxactive.j2pay.net.XMLHelper;
 import org.json.JSONObject;
 
+import java.util.HashMap;
+import java.util.Map;
+
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.RequestParameters.REFERENCE;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.ResponseParameters.*;
 import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.URL;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
 import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
 import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
@@ -219,91 +226,57 @@ public class BillproGateway extends Gateway {
 
     //private methods are starting below.
     private String buildPurchaseParameters(JSONObject apiParameters, String reference, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(ACCOUNT_ID, apiParameters.getString(ACCOUNT_ID));
+	    input.put(ACCOUNT_AUTHORIZATION, apiParameters.getString(ACCOUNT_AUTHORIZATION));
+	    input.put(REFERENCE, reference);
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(CURRENCY, currency);
+	    input.put(EMAIL_ADDRESS, customer.getEmail());
+	    input.put(IP_ADDRESS, customer.getIp());
+	    input.put(PHONE_NUMBER, customer.getPhoneNumber());
+	    input.put(FIRSTNAME, customer.getFirstName());
+	    input.put(LASTNAME, customer.getLastName());
+	    input.put(ADDRESS, customer.getAddress());
+	    input.put(CITY, customer.getCity());
+	    input.put(STATE, customer.getState());
+	    input.put(ZIPCODE, customer.getZip());
+	    input.put(COUNTRY, customer.getCountry().getCodeISO2());
+	    input.put(CREDIT_CARD_NUMBER, customerCard.getNumber());
+	    input.put(CREDIT_CARD_EXPIRY_MONTH, customerCard.getExpiryMonth());
+	    input.put(CREDIT_CARD_EXPIRY_YEAR, customerCard.getExpiryYear());
+	    input.put(CREDIT_CARD_CVV, customerCard.getCvv());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
-                .append("<Request type='AuthorizeCapture'>")
-                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
-                .append("<Transaction>")
-                .append("<Reference>").append(reference).append("</Reference>")
-                .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
-                .append("<Currency>").append(currency).append("</Currency>")
-                .append("<Email>").append(customer.getEmail()).append("</Email>")
-                .append("<IPAddress>").append(customer.getIp()).append("</IPAddress>")
-                .append("<Phone>").append(customer.getPhoneNumber()).append("</Phone>")
-                .append("<FirstName>").append(customer.getFirstName()).append("</FirstName>")
-                .append("<LastName>").append(customer.getLastName()).append("</LastName>")
-                .append("<Address>").append(customer.getAddress()).append("</Address>")
-                .append("<City>").append(customer.getCity()).append("</City>")
-                .append("<State>").append(customer.getState()).append("</State>")
-                .append("<PostCode>").append(customer.getZip()).append("</PostCode>")
-                .append("<Country>").append(customer.getCountry().getCodeISO2()).append("</Country>")
-                .append("<CardNumber>").append(customerCard.getNumber()).append("</CardNumber>")
-                .append("<CardExpMonth>").append(customerCard.getExpiryMonth()).append("</CardExpMonth>")
-                .append("<CardExpYear>").append(customerCard.getExpiryYear()).append("</CardExpYear>")
-                .append("<CardCVV>").append(customerCard.getCvv()).append("</CardCVV>")
-                .append("</Transaction>")
-                .append("</Request>");
-
-        return finalParams.toString();
-
+	    return createRequest(input, "Billpro/PurchaseRequest.ftl");
     }
 
     private String buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(ACCOUNT_ID, apiParameters.getString(ACCOUNT_ID));
+	    input.put(ACCOUNT_AUTHORIZATION, apiParameters.getString(ACCOUNT_AUTHORIZATION));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(TRANSACTION_ID.getName(), refundParameters.get(TRANSACTION_ID.getName()).toString());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version='1.0' encoding='UTF-8'?>")
-                .append("<Request type='Refund'>")
-                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
-                .append("<Transaction>")
-                .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
-                .append("<TransactionID>").append(refundParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
-                .append("</Transaction>")
-                .append("</Request>");
-
-        return finalParams.toString();
-
+	    return createRequest(input, "Billpro/RefundRequest.ftl");
     }
 
     private String buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(ACCOUNT_ID, apiParameters.getString(ACCOUNT_ID));
+	    input.put(ACCOUNT_AUTHORIZATION, apiParameters.getString(ACCOUNT_AUTHORIZATION));
+	    input.put(TRANSACTION_ID.getName(), voidParameters.get(TRANSACTION_ID.getName()).toString());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version='1.0' encoding='UTF-8'?>")
-                .append("<Request type='Void'>")
-                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
-                .append("<Transaction>")
-                .append("<TransactionID>").append(voidParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
-                .append("</Transaction>")
-                .append("</Request>");
-
-        return finalParams.toString();
+	    return createRequest(input, "Billpro/VoidRequest.ftl");
     }
 
     private String buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
+	    final Map<String, Object> input = new HashMap<>();
+	    input.put(ACCOUNT_ID, apiParameters.getString(ACCOUNT_ID));
+	    input.put(ACCOUNT_AUTHORIZATION, apiParameters.getString(ACCOUNT_AUTHORIZATION));
+	    input.put(REFERENCE, rebillParameters.getString(REFERENCE));
+	    input.put(AMOUNT.getName(), Float.toString(amount));
+	    input.put(TRANSACTION_ID.getName(), rebillParameters.get(TRANSACTION_ID.getName()).toString());
 
-        StringBuilder finalParams = new StringBuilder();
-
-        finalParams
-                .append("<?xml version='1.0' encoding='utf-8'?>")
-                .append("<Request type='Recur'>")
-                .append("<AccountID>").append(apiParameters.getString(ACCOUNT_ID)).append("</AccountID>")
-                .append("<AccountAuth>").append(apiParameters.getString(ACCOUNT_AUTHORIZATION)).append("</AccountAuth>")
-                .append("<Transaction>")
-                .append("<Reference>").append(rebillParameters.getString(REFERENCE)).append("</Reference>")
-                .append("<Amount>").append(Float.toString(amount)).append("</Amount>")
-                .append("<TransactionID>").append(rebillParameters.get(TRANSACTION_ID.getName()).toString()).append("</TransactionID>")
-                .append("</Transaction>")
-                .append("</Request>");
-
-        return finalParams.toString();
+	    return createRequest(input, "Billpro/RebillRequest.ftl");
     }
 }
