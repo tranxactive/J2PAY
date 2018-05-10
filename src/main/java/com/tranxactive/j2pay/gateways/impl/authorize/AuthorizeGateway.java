@@ -4,29 +4,32 @@
  * and open the template in the editor.
  
 */
-package com.tranxactive.j2pay.gateways;
+package com.tranxactive.j2pay.gateways.impl.authorize;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
 import com.tranxactive.j2pay.gateways.parameters.*;
 import com.tranxactive.j2pay.gateways.responses.*;
-import com.tranxactive.j2pay.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.LIVE_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.ResponseParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.TEST_URL;
+import static com.tranxactive.j2pay.gateways.impl.authorize.Constants.LIVE_URL;
+import static com.tranxactive.j2pay.gateways.impl.authorize.Constants.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.authorize.Constants.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.authorize.Constants.TEST_URL;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.CARD_LAST_4;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
-import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
-import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
-import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
-import static com.tranxactive.j2pay.net.XMLHelper.toJson;
+import static com.tranxactive.j2pay.util.RequestCreator.createRequest;
+import static com.tranxactive.j2pay.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static com.tranxactive.j2pay.helpers.net.HTTPClient.httpPost;
+import static com.tranxactive.j2pay.helpers.net.XMLHelper.toJson;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**
@@ -64,7 +67,7 @@ public class AuthorizeGateway extends Gateway {
                     httpResponse.setSuccessful(true);
                     successResponse = new PurchaseResponse();
                     successResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(MESSAGES).getJSONObject(MESSAGE).getString(DESCRIPTION));
-                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString());
+                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
                     successResponse.setCardValuesFrom(customerCard);
                     successResponse.setAmount(amount);
                     successResponse.setCurrencyCode(currency);
@@ -79,12 +82,12 @@ public class AuthorizeGateway extends Gateway {
                     }
 
                     successResponse.setRefundParams(new JSONObject()
-                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString())
+                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString())
                             .put(CARD_LAST_4.getName(), customerCard.getLast4())
                     );
 
                     successResponse.setVoidParams(new JSONObject()
-                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString())
+                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString())
                     );
 
                 } else {
@@ -133,11 +136,11 @@ public class AuthorizeGateway extends Gateway {
                     successResponse = new RefundResponse();
                     
                     successResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(MESSAGES).getJSONObject(MESSAGE).getString(DESCRIPTION));
-                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString());
+                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
                     successResponse.setAmount(amount);
                     
                     successResponse.setVoidParams(new JSONObject()
-                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString())
+                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString())
                     );
                 } else {
                     errorResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(ERRORS).getJSONObject(ERROR).getString(ERROR_TEXT));
@@ -188,18 +191,18 @@ public class AuthorizeGateway extends Gateway {
                     successResponse = new RebillResponse();
 
                     successResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(MESSAGES).getJSONObject(MESSAGE).getString(DESCRIPTION));
-                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString());
+                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
                     successResponse.setAmount(amount);
 
                     successResponse.setRebillParams(rebillParameters);
 
                     successResponse.setRefundParams(new JSONObject()
-                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString())
+                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString())
                             .put(CARD_LAST_4.getName(), cardLast4)
                     );
 
                     successResponse.setVoidParams(new JSONObject()
-                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString())
+                            .put(TRANSACTION_ID.getName(), resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString())
                     );
 
                 } else {
@@ -243,7 +246,7 @@ public class AuthorizeGateway extends Gateway {
                     successResponse = new VoidResponse();
 
                     successResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(MESSAGES).getJSONObject(MESSAGE).getString(DESCRIPTION));
-                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.Gateway.Authorize.ResponseParameters.TRANSACTION_ID).toString());
+                    successResponse.setTransactionId(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
 
                 } else {
                     errorResponse.setMessage(resp.getJSONObject(CREATE_TRANSACTION_RESPONSE).getJSONObject(TRANSACTION_RESPONSE).getJSONObject(ERRORS).getJSONObject(ERROR).getString(ERROR_TEXT));

@@ -3,13 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.net;
+package com.tranxactive.j2pay.helpers.net;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.ENCODING_UTF8;
 import static java.util.logging.Level.SEVERE;
 import static java.util.logging.Logger.getLogger;
 
@@ -18,6 +17,7 @@ import static java.util.logging.Logger.getLogger;
  * @author ilyas
  */
 public class StringHelper {
+    public static final String ENCODING_UTF8 = "UTF-8";
 
     private StringHelper() {
     }

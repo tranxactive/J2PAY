@@ -3,31 +3,30 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.gateways;
+package com.tranxactive.j2pay.gateways.impl.billpro;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
-import com.tranxactive.j2pay.gateways.parameters.Constants;
-import com.tranxactive.j2pay.gateways.parameters.Currency;
-import com.tranxactive.j2pay.gateways.parameters.Customer;
-import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
 import com.tranxactive.j2pay.gateways.responses.*;
-import com.tranxactive.j2pay.net.HTTPResponse;
-import com.tranxactive.j2pay.net.XMLHelper;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.net.XMLHelper;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.RequestParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.RequestParameters.REFERENCE;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.ResponseParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Billpro.URL;
+import static com.tranxactive.j2pay.gateways.impl.billpro.Constants.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.billpro.Constants.RequestParameters.REFERENCE;
+import static com.tranxactive.j2pay.gateways.impl.billpro.Constants.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.billpro.Constants.URL;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
-import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
-import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
-import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
+import static com.tranxactive.j2pay.util.RequestCreator.createRequest;
+import static com.tranxactive.j2pay.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static com.tranxactive.j2pay.helpers.net.HTTPClient.httpPost;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**
@@ -61,7 +60,7 @@ public class BillproGateway extends Gateway {
             successResponse = new PurchaseResponse();
 
             successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
             successResponse.setCardValuesFrom(customerCard);
@@ -105,7 +104,7 @@ public class BillproGateway extends Gateway {
             successResponse = new RefundResponse();
 
             successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
             successResponse.setVoidParams(new JSONObject().put(TRANSACTION_ID.getName(), successResponse.getTransactionId()));
 
@@ -145,7 +144,7 @@ public class BillproGateway extends Gateway {
             successResponse = new RebillResponse();
 
             successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
 
             successResponse.setRebillParams(new JSONObject()
@@ -188,7 +187,7 @@ public class BillproGateway extends Gateway {
             successResponse = new VoidResponse();
 
             successResponse.setMessage(resp.getJSONObject(RESPONSE).getString(DESCRIPTION));
-            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.Gateway.Billpro.ResponseParameters.TRANSACTION_ID).toString());
+            successResponse.setTransactionId(resp.getJSONObject(RESPONSE).get(Constants.ResponseParameters.TRANSACTION_ID).toString());
         } else {
             errorResponse.setMessage(resp.getJSONObject(RESPONSE).get(DESCRIPTION).toString());
         }

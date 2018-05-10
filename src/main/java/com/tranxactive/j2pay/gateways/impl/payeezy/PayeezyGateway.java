@@ -3,33 +3,31 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.gateways;
+package com.tranxactive.j2pay.gateways.impl.payeezy;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
-import com.tranxactive.j2pay.gateways.parameters.Currency;
-import com.tranxactive.j2pay.gateways.parameters.Customer;
-import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
 import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
 import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
 import com.tranxactive.j2pay.gateways.responses.RefundResponse;
 import com.tranxactive.j2pay.gateways.responses.VoidResponse;
-import com.tranxactive.j2pay.net.HTTPClient;
-import com.tranxactive.j2pay.net.HTTPResponse;
-import com.tranxactive.j2pay.net.XMLHelper;
+import com.tranxactive.j2pay.helpers.net.HTTPClient;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.net.XMLHelper;
 import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.RequestParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Authorize.ResponseParameters.NAME;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.LIVE_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.ResponseParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.TEST_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.Payeezy.TRANSACTION_RESULT;
-import static com.tranxactive.j2pay.gateways.parameters.ParamList.*;
-import static com.tranxactive.j2pay.gateways.util.RequestCreator.createRequest;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.AMOUNT;
+import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.impl.payeezy.Constants.*;
+import static com.tranxactive.j2pay.gateways.impl.payeezy.Constants.RequestParameters.TRANSACTION_KEY;
+import static com.tranxactive.j2pay.gateways.impl.payeezy.Constants.ResponseParameters.*;
+import static com.tranxactive.j2pay.util.RequestCreator.createRequest;
+import static com.tranxactive.j2pay.util.ResponseProcessor.processFinalResponse;
 import static org.apache.http.entity.ContentType.APPLICATION_XML;
 
 /**

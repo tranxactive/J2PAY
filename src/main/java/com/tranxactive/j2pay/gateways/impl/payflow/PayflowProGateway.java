@@ -3,29 +3,29 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.gateways;
+package com.tranxactive.j2pay.gateways.impl.payflow;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
-import com.tranxactive.j2pay.gateways.parameters.Currency;
-import com.tranxactive.j2pay.gateways.parameters.Customer;
-import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
 import com.tranxactive.j2pay.gateways.responses.*;
-import com.tranxactive.j2pay.net.HTTPResponse;
-import com.tranxactive.j2pay.net.QueryStringHelper;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.net.QueryStringHelper;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.LIVE_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.RESULT;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.RequestParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.ResponseParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.PayflowPro.TEST_URL;
+import static com.tranxactive.j2pay.gateways.impl.payflow.Constants.LIVE_URL;
+import static com.tranxactive.j2pay.gateways.impl.payflow.Constants.RESULT;
+import static com.tranxactive.j2pay.gateways.impl.payflow.Constants.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.payflow.Constants.ResponseParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.payflow.Constants.TEST_URL;
 import static com.tranxactive.j2pay.gateways.parameters.ParamList.TRANSACTION_ID;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
-import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
-import static com.tranxactive.j2pay.net.HTTPClient.httpPost;
-import static com.tranxactive.j2pay.net.JSONHelper.decode;
-import static com.tranxactive.j2pay.net.JSONHelper.encode;
-import static com.tranxactive.j2pay.net.QueryStringHelper.toQueryString;
+import static com.tranxactive.j2pay.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.util.UniqueCustomerIdGenerator.getUniqueCustomerId;
+import static com.tranxactive.j2pay.helpers.net.HTTPClient.httpPost;
+import static com.tranxactive.j2pay.helpers.net.JSONHelper.decode;
+import static com.tranxactive.j2pay.helpers.net.JSONHelper.encode;
+import static com.tranxactive.j2pay.helpers.net.QueryStringHelper.toQueryString;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 
 /**

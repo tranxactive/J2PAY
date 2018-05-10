@@ -5,10 +5,10 @@
  */
 package com.tranxactive.j2pay.gateways.core;
 
-import com.tranxactive.j2pay.gateways.parameters.Currency;
-import com.tranxactive.j2pay.gateways.parameters.Customer;
-import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
-import com.tranxactive.j2pay.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
 import org.json.JSONObject;
 
 /**

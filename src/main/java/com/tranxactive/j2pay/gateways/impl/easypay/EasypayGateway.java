@@ -3,69 +3,66 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.gateways;
+package com.tranxactive.j2pay.gateways.impl.easypay;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
-import com.tranxactive.j2pay.gateways.parameters.Currency;
-import com.tranxactive.j2pay.gateways.parameters.Customer;
-import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
+import com.tranxactive.j2pay.helpers.entities.Currency;
+import com.tranxactive.j2pay.helpers.entities.Customer;
+import com.tranxactive.j2pay.helpers.entities.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
 import com.tranxactive.j2pay.gateways.responses.*;
-import com.tranxactive.j2pay.net.HTTPClient;
-import com.tranxactive.j2pay.net.HTTPResponse;
-import com.tranxactive.j2pay.net.JSONHelper;
-import com.tranxactive.j2pay.net.QueryStringHelper;
+import com.tranxactive.j2pay.helpers.net.HTTPClient;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.net.JSONHelper;
+import com.tranxactive.j2pay.helpers.net.QueryStringHelper;
 import org.json.JSONObject;
 
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.NMI.API_URL;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.NMI.RequestParameters.*;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.NMI.ResponseParameters.RESPONSE_CODE;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.NMI.ResponseParameters.RESPONSE_TEXT;
-import static com.tranxactive.j2pay.gateways.parameters.Constants.Gateway.NMI.ResponseParameters.TRANSACTION_ID;
-import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.impl.easypay.Constants.RequestParameters.*;
+import static com.tranxactive.j2pay.gateways.impl.easypay.Constants.ResponseParameters.CUSTOMER_VAULT_ID;
+import static com.tranxactive.j2pay.gateways.impl.easypay.Constants.ResponseParameters.RESPONSE;
+import static com.tranxactive.j2pay.gateways.impl.easypay.Constants.ResponseParameters.TRANSACTION_ID;
+import static com.tranxactive.j2pay.gateways.impl.easypay.Constants.URL;
+import static com.tranxactive.j2pay.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.util.UniqueCustomerIdGenerator.getUniqueVaultId;
 import static org.apache.http.entity.ContentType.APPLICATION_FORM_URLENCODED;
 
 /**
- *
- * @author ilyas
+ * @author Tkhan
  */
-public class NMIGateway extends Gateway {
-
+public class EasypayGateway extends Gateway {
 
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        JSONObject requestObject = this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount);
-        JSONObject responseObject;
-        String requestString;
-        String responseString;
+        String customerVaultId = getUniqueVaultId();
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildPurchaseParameters(apiParameters, customerVaultId, customer, customerCard, currency, amount)));
 
-        requestObject = JSONHelper.encode(requestObject);
-        requestString = QueryStringHelper.toQueryString(requestObject);
+        JSONObject responseObject;
         HTTPResponse httpResponse;
 
         PurchaseResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(API_URL, requestString, APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
-        responseString = httpResponse.getContent();
-        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt(RESPONSE_CODE) == 100) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
+
             httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
+
             successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
             successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setCardValuesFrom(customerCard);
             successResponse.setAmount(amount);
             successResponse.setCurrencyCode(currency);
 
-            successResponse.setRebillParams(new JSONObject().put(CUSTOMER_VAULT_ID, responseObject.get(CUSTOMER_VAULT_ID).toString()));
+            successResponse.setRebillParams(new JSONObject().put(CUSTOMER_VAULT_ID, customerVaultId));
             successResponse.setRefundParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
             successResponse.setVoidParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
 
@@ -76,41 +73,38 @@ public class NMIGateway extends Gateway {
         //final response.
         processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
-
     }
 
     @Override
     public HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount) {
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildRefundParameters(apiParameters, refundParameters, amount)));
 
-        JSONObject requestObject = this.buildRefundParameters(apiParameters, refundParameters, amount);
         JSONObject responseObject;
-        String requestString;
-        String responseString;
-
-        requestObject = JSONHelper.encode(requestObject);
-        requestString = QueryStringHelper.toQueryString(requestObject);
-
         HTTPResponse httpResponse;
 
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(API_URL, requestString, APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
-        responseString = httpResponse.getContent();
-        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt(RESPONSE_CODE) == 100) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
+            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
+
             successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
             successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
 
-            successResponse.setVoidParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
+            successResponse.setVoidParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString())
+            );
+
         } else {
             errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
@@ -118,40 +112,35 @@ public class NMIGateway extends Gateway {
         //final response.
         processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
-
     }
 
     @Override
     public HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
 
-        JSONObject requestObject = this.buildRebillParameters(apiParameters, rebillParameters, amount);
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildRebillParameters(apiParameters, rebillParameters, amount)));
+
         JSONObject responseObject;
-        String requestString;
-        String responseString;
-        requestObject = JSONHelper.encode(requestObject);
-        requestString = QueryStringHelper.toQueryString(requestObject);
         HTTPResponse httpResponse;
 
         RebillResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(API_URL, requestString, APPLICATION_FORM_URLENCODED);
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
 
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
-        responseString = httpResponse.getContent();
-        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt(RESPONSE_CODE) == 100) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
             httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
             successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
             successResponse.setAmount(amount);
-            successResponse.setRebillParams(rebillParameters);
+            successResponse.setRebillParams(new JSONObject().put(CUSTOMER_VAULT_ID, rebillParameters.getString(CUSTOMER_VAULT_ID)));
             successResponse.setRefundParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
             successResponse.setVoidParams(new JSONObject().put(ParamList.TRANSACTION_ID.getName(), responseObject.get(TRANSACTION_ID).toString()));
         } else {
@@ -166,33 +155,28 @@ public class NMIGateway extends Gateway {
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
 
-        JSONObject requestObject = this.buildVoidParameters(apiParameters, voidParameters);
-        JSONObject responseObject;
-        String requestString;
-        String responseString;
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildVoidParameters(apiParameters, voidParameters)));
 
-        requestObject = JSONHelper.encode(requestObject);
-        requestString = QueryStringHelper.toQueryString(requestObject);
+        JSONObject responseObject;
         HTTPResponse httpResponse;
 
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
 
-        httpResponse = HTTPClient.httpPost(API_URL, requestString, APPLICATION_FORM_URLENCODED);
-
+        httpResponse = HTTPClient.httpPost(URL, requestString, APPLICATION_FORM_URLENCODED);
         if (httpResponse.getStatusCode() == -1) {
             return httpResponse;
         }
 
-        responseString = httpResponse.getContent();
-        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
-        if (responseObject.getInt(RESPONSE_CODE) == 100) {
+        if ("1".equals(responseObject.getString(RESPONSE))) {
             httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
             successResponse.setTransactionId(responseObject.get(TRANSACTION_ID).toString());
+
         } else {
             errorResponse.setMessage(responseObject.getString(RESPONSE_TEXT));
         }
@@ -204,39 +188,37 @@ public class NMIGateway extends Gateway {
 
     @Override
     public JSONObject getApiSampleParameters() {
-        return new JSONObject()
-                .put(USERNAME, "the api user name use demo for testing")
-                .put(PASSWORD, "the api password use password for testing");
+        return new JSONObject().put(USERNAME, "the user name").put(PASSWORD, "merchant password.");
     }
 
     @Override
     public JSONObject getRefundSampleParameters() {
-        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded");
+        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
     }
 
     @Override
     public JSONObject getRebillSampleParameters() {
-        return new JSONObject().put(CUSTOMER_VAULT_ID, "the customer vault id");
+        return new JSONObject().put(CUSTOMER_VAULT_ID, "customer Vault ID required for recurring");
     }
 
     @Override
     public JSONObject getVoidSampleParameters() {
-        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be void");
+        return new JSONObject().put(ParamList.TRANSACTION_ID.getName(), "the transaction id can also be used to refer this transaction later");
     }
 
-    //private methods are starting below.
-    private JSONObject buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+    private JSONObject buildPurchaseParameters(JSONObject apiParameters, String customerVaultId, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        JSONObject object = new JSONObject();
-        object
+        return new JSONObject()
                 .put(TRANSACTION_TYPE, TRANSACTION_TYPE_PURCHASE)
                 .put(USERNAME, apiParameters.getString(USERNAME))
                 .put(PASSWORD, apiParameters.getString(PASSWORD))
                 .put(CREDIT_CARD_NUMBER, customerCard.getNumber())
-                .put(CREDIT_CARD_EXPIRY_DATE, customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
                 .put(CREDIT_CARD_CVV, customerCard.getCvv())
+                .put(CREDIT_CARD_EXPIRY_DATE, customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
                 .put(AMOUNT, amount)
                 .put(CURRENCY, currency)
+                .put(BILLING_METHOD, RECURRING)
+                .put(IP_ADDRESS, customer.getIp())
                 .put(FIRSTNAME, customer.getFirstName())
                 .put(LASTNAME, customer.getLastName())
                 .put(ADDRESS, customer.getAddress())
@@ -246,48 +228,32 @@ public class NMIGateway extends Gateway {
                 .put(COUNTRY, customer.getCountry().getCodeISO2())
                 .put(PHONE_NUMBER, customer.getPhoneNumber())
                 .put(EMAIL, customer.getEmail())
-                .put(IP_ADDRESS, customer.getIp())
-                .put(CUSTOMER_VAULT, ADD_CUSTOMER);
-
-        return object;
-
+                .put(CUSTOMER_VAULT, ADD_CUSTOMER)
+                .put(CUSTOMER_VAULT_ID, customerVaultId);
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
-
-        JSONObject object = new JSONObject();
-        object
+        return new JSONObject()
                 .put(TRANSACTION_TYPE, TRANSACTION_TYPE_VOID)
                 .put(USERNAME, apiParameters.getString(USERNAME))
                 .put(PASSWORD, apiParameters.getString(PASSWORD))
-                .put(TRANSACTION_ID, voidParameters.getString(ParamList.TRANSACTION_ID.getName()));
-
-        return object;
+                .put(TRANSACTION_ID, voidParameters.getString(TRANSACTION_ID));
     }
 
-    private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject voidParameters, float amount) {
-
-        JSONObject object = new JSONObject();
-        object
+    private JSONObject buildRefundParameters(JSONObject apiParameters, JSONObject refundParameters, float amount) {
+        return new JSONObject()
                 .put(TRANSACTION_TYPE, TRANSACTION_TYPE_REFUND)
                 .put(USERNAME, apiParameters.getString(USERNAME))
                 .put(PASSWORD, apiParameters.getString(PASSWORD))
-                .put(TRANSACTION_ID, voidParameters.getString(ParamList.TRANSACTION_ID.getName()))
-                .put(AMOUNT, Float.toString(amount));
-
-        return object;
+                .put(TRANSACTION_ID, refundParameters.getString(TRANSACTION_ID))
+                .put(AMOUNT, amount);
     }
 
     private JSONObject buildRebillParameters(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
-
-        JSONObject object = new JSONObject();
-        object
+        return new JSONObject()
                 .put(USERNAME, apiParameters.getString(USERNAME))
                 .put(PASSWORD, apiParameters.getString(PASSWORD))
                 .put(CUSTOMER_VAULT_ID, rebillParameters.getString(CUSTOMER_VAULT_ID))
-                .put(AMOUNT, Float.toString(amount));
-
-        return object;
+                .put(AMOUNT, amount);
     }
-
 }

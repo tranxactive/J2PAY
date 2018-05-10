@@ -3,10 +3,12 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.net;
+package com.tranxactive.j2pay.helpers.net;
 
 import org.json.JSONObject;
 import org.json.XML;
+
+import static org.json.XML.toJSONObject;
 
 /**
  *
@@ -23,8 +25,7 @@ public class XMLHelper {
      * @return the JSONObject json representation of xml
      */
     public static JSONObject toJson(String xml) {
-
-        return XML.toJSONObject(xml);
+        return toJSONObject(xml);
     }
 
     /**
@@ -34,7 +35,6 @@ public class XMLHelper {
      * @return the xml representation of JSONObject.
      */
     public static String fromJson(JSONObject object) {
-
         return XML.toString(object);
     }
 

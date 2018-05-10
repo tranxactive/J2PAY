@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.net;
+package com.tranxactive.j2pay.helpers.net;
 
 import org.json.JSONObject;
 

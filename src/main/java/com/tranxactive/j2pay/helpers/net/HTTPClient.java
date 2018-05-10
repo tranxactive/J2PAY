@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package com.tranxactive.j2pay.net;
+package com.tranxactive.j2pay.helpers.net;
 
 import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
 import org.apache.http.client.methods.CloseableHttpResponse;
@@ -39,7 +39,7 @@ public class HTTPClient {
      * @return The HTTPResponse
      * @throws java.io.IOException in case of any failure to communicating the
      * server
-     * @see com.tranxactive.j2pay.net.HTTPResponse
+     * @see com.tranxactive.j2pay.helpers.net.HTTPResponse
      */
     public static HTTPResponse httpGet(String url) throws IOException {
 
@@ -67,7 +67,7 @@ public class HTTPClient {
      * @param charset the charset in which request will be posted if null is
      * provided contentType charset will be used.
      * @return The HTTPResponse class.
-     * @see com.tranxactive.j2pay.net.HTTPResponse
+     * @see com.tranxactive.j2pay.helpers.net.HTTPResponse
      * @see ContentType
      */
     public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, Charset charset) {
@@ -103,7 +103,7 @@ public class HTTPClient {
      * @param postParams parameters which will be passed for post.
      * @param contentType content-type in which data will be posted.
      * @return The HTTPResponse class.
-     * @see com.tranxactive.j2pay.net.HTTPResponse
+     * @see com.tranxactive.j2pay.helpers.net.HTTPResponse
      * @see ContentType
      */
     public static HTTPResponse httpPost(String url, String postParams, ContentType contentType) {

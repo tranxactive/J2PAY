@@ -1,7 +1,7 @@
-package com.tranxactive.j2pay.gateways.util;
+package com.tranxactive.j2pay.util;
 
 import com.tranxactive.j2pay.gateways.responses.CoreResponse;
-import com.tranxactive.j2pay.net.HTTPResponse;
+import com.tranxactive.j2pay.helpers.net.HTTPResponse;
 import org.json.JSONObject;
 
 /**

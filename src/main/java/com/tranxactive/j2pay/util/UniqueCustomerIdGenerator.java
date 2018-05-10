@@ -1,4 +1,4 @@
-package com.tranxactive.j2pay.gateways.util;
+package com.tranxactive.j2pay.util;
 
 import java.util.Random;
 

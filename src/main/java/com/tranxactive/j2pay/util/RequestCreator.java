@@ -1,6 +1,6 @@
-package com.tranxactive.j2pay.gateways.util;
+package com.tranxactive.j2pay.util;
 
-import com.tranxactive.j2pay.gateways.AuthorizeGateway;
+import com.tranxactive.j2pay.gateways.impl.authorize.AuthorizeGateway;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
