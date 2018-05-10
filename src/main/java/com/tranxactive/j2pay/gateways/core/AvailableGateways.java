@@ -16,7 +16,8 @@ public enum AvailableGateways {
     PAYEEZY("com.tranxactive.j2pay.gateways.PayeezyGateway"),
     PAYFLOWPRO("com.tranxactive.j2pay.gateways.PayflowProGateway"),
     BILLPRO("com.tranxactive.j2pay.gateways.PayeezyGateway"),
-    EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway");
+    EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway"),
+    CHECKOUT("com.tranxactive.j2pay.gateways.CheckoutGateway");
 
     private String paymentGateWayClassPath;
     
