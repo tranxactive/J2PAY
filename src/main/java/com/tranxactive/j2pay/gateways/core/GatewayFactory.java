@@ -12,10 +12,6 @@ import static java.lang.Class.forName;
  * @author ilyas
  */
 public class GatewayFactory {
-
-    private GatewayFactory() {
-
-    }
     
     public static Gateway getGateway(AvailableGateways availableGateways) {
         

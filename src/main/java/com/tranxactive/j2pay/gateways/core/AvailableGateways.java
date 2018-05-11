@@ -11,12 +11,12 @@ package com.tranxactive.j2pay.gateways.core;
  */
 public enum AvailableGateways {
 
-    AUTHORIZE ("com.tranxactive.j2pay.gateways.impl.authorize.AuthorizeGateway"),
-    NMI       ("com.tranxactive.j2pay.gateways.impl.nmi.NMIGateway"),
-    PAYEEZY   ("com.tranxactive.j2pay.gateways.impl.payeezy.PayeezyGateway"),
-    PAYFLOWPRO("com.tranxactive.j2pay.gateways.impl.payflow.PayflowProGateway"),
-    BILLPRO   ("com.tranxactive.j2pay.gateways.impl.billpro.BillproGateway"),
-    EASYPAY   ("com.tranxactive.j2pay.gateways.impl.easypay.EasypayGateway");
+    AUTHORIZE("com.tranxactive.j2pay.gateways.AuthorizeGateway"),
+    NMI("com.tranxactive.j2pay.gateways.NMIGateway"),
+    PAYEEZY("com.tranxactive.j2pay.gateways.PayeezyGateway"),
+    PAYFLOWPRO("com.tranxactive.j2pay.gateways.PayflowProGateway"),
+    BILLPRO("com.tranxactive.j2pay.gateways.PayeezyGateway"),
+    EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway");
 
     private String paymentGateWayClassPath;
     
