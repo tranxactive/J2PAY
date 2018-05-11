@@ -17,6 +17,7 @@ import org.apache.http.util.EntityUtils;
 
 import java.io.IOException;
 import java.nio.charset.Charset;
+import java.util.HashMap;
 
 import static org.apache.http.entity.ContentType.create;
 
@@ -61,11 +62,12 @@ public class HTTPClient {
      * @param contentType content-type in which data will be posted.
      * @param charset the charset in which request will be posted if null is
      * provided contentType charset will be used.
+     * @param headers To add additional headers otherwise pass null
      * @return The HTTPResponse class.
      * @see com.tranxactive.j2pay.net.HTTPResponse
      * @see ContentType
      */
-    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, Charset charset) {
+    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, Charset charset, HashMap<String, String> headers) {
 
         HTTPResponse hTTPResponse;
 
@@ -74,6 +76,12 @@ public class HTTPClient {
             HttpPost httpPost = new HttpPost(url);
             httpPost.setEntity(new StringEntity(postParams));
             httpPost.addHeader("Content-Type", charset == null ? contentType.toString() : create(contentType.getMimeType(), charset).toString());
+
+            if (headers != null) {
+                headers.keySet().forEach((key) -> {
+                    httpPost.addHeader(key, headers.get(key));
+                });
+            }
 
             startTime = System.currentTimeMillis();
 
@@ -102,7 +110,23 @@ public class HTTPClient {
      * @see ContentType
      */
     public static HTTPResponse httpPost(String url, String postParams, ContentType contentType) {
-        return httpPost(url, postParams, contentType, null);
+        return httpPost(url, postParams, contentType, null, null);
+
+    }
+
+    /**
+     * This method is the wrapper of apache http client post request.
+     *
+     * @param url The url on which the request will be hit.
+     * @param postParams parameters which will be passed for post.
+     * @param contentType content-type in which data will be posted.
+     * @param headers To add additional headers otherwise pass null.
+     * @return The HTTPResponse class.
+     * @see com.tranxactive.j2pay.net.HTTPResponse
+     * @see ContentType
+     */
+    public static HTTPResponse httpPost(String url, String postParams, ContentType contentType, HashMap<String, String> headers) {
+        return httpPost(url, postParams, contentType, null, headers);
 
     }
 
