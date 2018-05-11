@@ -57,7 +57,7 @@ The following gateways are available.
 4. Ensure your code is nicely formatted.
 5. Send the pull request.
 
-**`contributors are welcome to add or improve gateways but modifications to core library are not allowed, although we are open for suggestions`**
+**`Contributors are welcome to add or improve gateways but modifications to core library are not allowed, although we are open for suggestions`**
 
 # Contact us.
 
