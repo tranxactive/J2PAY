@@ -111,6 +111,8 @@ public class CheckoutGateway extends Gateway {
         responseObject = httpResponse.getJSONResponse();
 
         if (responseObject.has("responseCode") && (responseObject.get("responseCode").toString().startsWith("10"))) {
+
+            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
             successResponse.setMessage(responseObject.get("responseMessage").toString());
             successResponse.setTransactionId(responseObject.get("id").toString());
@@ -235,8 +237,6 @@ public class CheckoutGateway extends Gateway {
     @Override
     public JSONObject getRebillSampleParameters() {
         return new JSONObject()
-                .put("autoCapTime", "1")
-                .put("autoCapture", "Y")
                 .put("customerId", "Customer ID provided by our system on successful purchase response")
                 .put("currency", "Amount Currency")
                 .put("cardId", "Card ID provided by our system on successful purchase response")
