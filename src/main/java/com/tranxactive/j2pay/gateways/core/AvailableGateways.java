@@ -15,11 +15,11 @@ public enum AvailableGateways {
     NMI("com.tranxactive.j2pay.gateways.NMIGateway"),
     PAYEEZY("com.tranxactive.j2pay.gateways.PayeezyGateway"),
     PAYFLOWPRO("com.tranxactive.j2pay.gateways.PayflowProGateway"),
-    BILLPRO("com.tranxactive.j2pay.gateways.PayeezyGateway"),
+    BILLPRO("com.tranxactive.j2pay.gateways.BillproGateway"),
     EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway"),
     CHECKOUT("com.tranxactive.j2pay.gateways.CheckoutGateway");
 
-    private String paymentGateWayClassPath;
+    private final String paymentGateWayClassPath;
     
     AvailableGateways(String classPath) {
         this.paymentGateWayClassPath = classPath;
