@@ -5,19 +5,36 @@
  */
 package com.tranxactive.j2pay.gateways.core;
 
+import com.tranxactive.j2pay.gateways.AuthorizeGateway;
+
+import com.tranxactive.j2pay.gateways.NMIGateway;
+
+import com.tranxactive.j2pay.gateways.PayeezyGateway;
+
+import com.tranxactive.j2pay.gateways.PayflowProGateway;
+
+import com.tranxactive.j2pay.gateways.BillproGateway;
+
+import com.tranxactive.j2pay.gateways.EasypayGateway;
+
+import com.tranxactive.j2pay.gateways.CheckoutGateway;
+
+
+
+
 /**
  *
  * @author ilyas
  */
 public enum AvailableGateways {
 
-    AUTHORIZE("com.tranxactive.j2pay.gateways.AuthorizeGateway"),
-    NMI("com.tranxactive.j2pay.gateways.NMIGateway"),
-    PAYEEZY("com.tranxactive.j2pay.gateways.PayeezyGateway"),
-    PAYFLOWPRO("com.tranxactive.j2pay.gateways.PayflowProGateway"),
-    BILLPRO("com.tranxactive.j2pay.gateways.BillproGateway"),
-    EASYPAY("com.tranxactive.j2pay.gateways.EasypayGateway"),
-    CHECKOUT("com.tranxactive.j2pay.gateways.CheckoutGateway");
+    AUTHORIZE(AuthorizeGateway.class.getName()),
+    NMI(NMIGateway.class.getName()),
+    PAYEEZY(PayeezyGateway.class.getName()),
+    PAYFLOWPRO(PayflowProGateway.class.getName()),
+    BILLPRO(BillproGateway.class.getName()),
+    EASYPAY(EasypayGateway.class.getName()),
+    CHECKOUT(CheckoutGateway.class.getName());
 
     private final String paymentGateWayClassPath;
     
