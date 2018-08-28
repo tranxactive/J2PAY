@@ -109,6 +109,7 @@ public class NMIGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
 
         if (responseObject.getInt("response_code") == 100) {
+            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
             successResponse.setMessage(responseObject.getString("responsetext"));
             successResponse.setTransactionId(responseObject.get("transactionid").toString());
