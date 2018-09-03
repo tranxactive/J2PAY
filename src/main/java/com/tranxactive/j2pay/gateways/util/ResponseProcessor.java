@@ -9,12 +9,13 @@ import org.json.JSONObject;
  * @author dwamara
  */
 public class ResponseProcessor {
-    public static void processFinalResponse(JSONObject responseObject, HTTPResponse httpResponse, CoreResponse successResponse, CoreResponse errorResponse) {
+    public static void processFinalResponse(JSONObject gatewayResponseObject, HTTPResponse httpResponse, CoreResponse successResponse, CoreResponse errorResponse) {
         if (successResponse != null) {
-            successResponse.setGatewayResponse(responseObject);
+            httpResponse.setSuccessful(true);
+            successResponse.setGatewayResponse(gatewayResponseObject);
             httpResponse.setContent(successResponse.getResponse().toString());
         } else {
-            errorResponse.setGatewayResponse(responseObject);
+            errorResponse.setGatewayResponse(gatewayResponseObject);
             httpResponse.setContent(errorResponse.getResponse().toString());
         }
     }

@@ -52,7 +52,6 @@ public class PayeezyGateway extends Gateway {
             boolean transactionApproved = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Approved");
 
             if (transactionApproved) {
-                httpResponse.setSuccessful(true);
                 successResponse = new PurchaseResponse();
 
                 successResponse.setMessage(resp.getJSONObject("TransactionResult").getString("Bank_Message"));
@@ -74,6 +73,7 @@ public class PayeezyGateway extends Gateway {
 
             } else {
                 errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
             }
 
         } else {
@@ -105,7 +105,6 @@ public class PayeezyGateway extends Gateway {
             boolean transactionApproved = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Approved");
 
             if (transactionApproved) {
-                httpResponse.setSuccessful(true);
                 successResponse = new RefundResponse();
 
                 successResponse.setMessage(resp.getJSONObject("TransactionResult").getString("Bank_Message"));
@@ -120,6 +119,7 @@ public class PayeezyGateway extends Gateway {
 
             } else {
                 errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
             }
 
         } else {
@@ -157,7 +157,6 @@ public class PayeezyGateway extends Gateway {
             boolean transactionApproved = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Approved");
 
             if (transactionApproved) {
-                httpResponse.setSuccessful(true);
                 successResponse = new VoidResponse();
 
                 successResponse.setMessage(resp.getJSONObject("TransactionResult").getString("Bank_Message"));
@@ -165,6 +164,7 @@ public class PayeezyGateway extends Gateway {
 
             } else {
                errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+               errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
             }
 
         } else {
@@ -249,7 +249,7 @@ public class PayeezyGateway extends Gateway {
             amountString = Float.toString(amount);
             transactionType = "34";
         } else {
-            amountString = voidParameters.get(ParamList.TRANSACTION_ID.getName()).toString();
+            amountString = voidParameters.get(ParamList.AMOUNT.getName()).toString();
             transactionType = "33";
         }
 
@@ -260,7 +260,7 @@ public class PayeezyGateway extends Gateway {
                 .append("<Transaction>")
                 .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
                 .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
-                .append("<Transaction_Type>" + transactionType + "</Transaction_Type>")
+                .append("<Transaction_Type>").append(transactionType).append("</Transaction_Type>")
                 .append("<DollarAmount>").append(amountString).append("</DollarAmount>")
                 .append("<Transaction_Tag>").append(voidParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</Transaction_Tag>")
                 .append("<Authorization_Num>").append(voidParameters.get("authorizationNumber").toString()).append("</Authorization_Num>")

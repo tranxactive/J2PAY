@@ -93,7 +93,9 @@ public class HTTPClient {
             hTTPResponse.setRequestString(postParams);
             EntityUtils.consume(closeableHttpResponse.getEntity());
         } catch (IOException e) {
-            return new HTTPResponse(-1, new ErrorResponse("could not connect to host", null).getResponse().toString(), System.currentTimeMillis() - startTime);
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setMessage("could not connect to host");
+            return new HTTPResponse(-1, errorResponse.getResponse().toString(), System.currentTimeMillis() - startTime);
         }
         return hTTPResponse;
 

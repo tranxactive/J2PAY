@@ -1,27 +1,17 @@
 package com.tranxactive.j2pay.gateways.responses;
 
-import com.tranxactive.j2pay.gateways.parameters.ParamList;
 import org.json.JSONObject;
 
 /**
  *
  * @author dwamara
  */
-public class CoreResponse implements Responseable {
+public abstract class CoreResponse {
 
     protected boolean success = false;
+    protected String transactionId = null;
     protected String message = null;
     protected JSONObject gatewayResponse = null;
-
-    public CoreResponse() {
-    }
-
-    public CoreResponse(final boolean success, String message, JSONObject gatewayResponse) {
-        this.success = success;
-        this.message = message;
-        this.gatewayResponse = gatewayResponse;
-
-    }
 
     /**
      * @return the message
@@ -58,13 +48,19 @@ public class CoreResponse implements Responseable {
         this.gatewayResponse = gatewayResponse;
     }
 
-    @Override
-    public JSONObject getResponse() {
-        return new JSONObject()
-                .put(ParamList.LIBRARY_RESPONSE.getName(), new JSONObject()
-                        .put(ParamList.SUCCESS.getName(), this.success)
-                        .put(ParamList.MESSAGE.getName(), this.message)
-                )
-                .put(ParamList.GATEWAY_RESPONSE.getName(), this.gatewayResponse != null ? this.gatewayResponse : JSONObject.NULL);
+    public abstract JSONObject getResponse();
+
+    /**
+     * @return the transactionId
+     */
+    public String getTransactionId() {
+        return transactionId;
+    }
+
+    /**
+     * @param transactionId the transactionId to set
+     */
+    public void setTransactionId(String transactionId) {
+        this.transactionId = transactionId;
     }
 }

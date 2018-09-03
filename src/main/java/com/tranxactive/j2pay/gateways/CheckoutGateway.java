@@ -52,7 +52,6 @@ public class CheckoutGateway extends Gateway {
 
         if (responseObject.has("responseCode") && (responseObject.get("responseCode").toString().startsWith("10"))) {
 
-            httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
             successResponse.setMessage(responseObject.get("responseMessage").toString());
             successResponse.setTransactionId(responseObject.get("id").toString());
@@ -79,6 +78,7 @@ public class CheckoutGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.get("message").toString());
+            errorResponse.setTransactionId(responseObject.optString("id"));
         }
 
         //final response.
@@ -112,7 +112,6 @@ public class CheckoutGateway extends Gateway {
 
         if (responseObject.has("responseCode") && (responseObject.get("responseCode").toString().startsWith("10"))) {
 
-            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
             successResponse.setMessage(responseObject.get("responseMessage").toString());
             successResponse.setTransactionId(responseObject.get("id").toString());
@@ -124,6 +123,7 @@ public class CheckoutGateway extends Gateway {
             );
         } else {
             errorResponse.setMessage(responseObject.get("message").toString());
+            errorResponse.setTransactionId(responseObject.optString("id"));
         }
 
         //final response.
@@ -156,7 +156,6 @@ public class CheckoutGateway extends Gateway {
         responseObject = httpResponse.getJSONResponse();
 
         if (responseObject.has("responseCode") && (responseObject.get("responseCode").toString().startsWith("10"))) {
-            httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(responseObject.get("responseMessage").toString());
@@ -176,6 +175,7 @@ public class CheckoutGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.get("message").toString());
+            errorResponse.setTransactionId(responseObject.optString("id"));
         }
 
         //final response.
@@ -206,7 +206,6 @@ public class CheckoutGateway extends Gateway {
         responseObject = httpResponse.getJSONResponse();
 
         if (responseObject.has("responseCode") && (responseObject.get("responseCode").toString().startsWith("10"))) {
-            httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(responseObject.get("responseMessage").toString());
@@ -214,6 +213,7 @@ public class CheckoutGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.get("message").toString());
+            errorResponse.setTransactionId(responseObject.optString("id"));
         }
 
         //final response.

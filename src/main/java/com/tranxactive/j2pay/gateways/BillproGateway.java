@@ -49,7 +49,6 @@ public class BillproGateway extends Gateway {
         result = resp.getJSONObject("Response").getInt("ResponseCode");
 
         if (result == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
             successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
@@ -73,6 +72,7 @@ public class BillproGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setTransactionId(resp.getJSONObject("Response").optString("TransactionID"));
         }
 
         //final response.
@@ -100,7 +100,6 @@ public class BillproGateway extends Gateway {
         result = resp.getJSONObject("Response").getInt("ResponseCode");
 
         if (result == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
             successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
@@ -113,6 +112,7 @@ public class BillproGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setTransactionId(resp.getJSONObject("Response").optString("TransactionID"));
         }
 
         //final response.
@@ -143,7 +143,6 @@ public class BillproGateway extends Gateway {
 
         if (result == 100) {
 
-            httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
@@ -165,6 +164,7 @@ public class BillproGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setTransactionId(resp.getJSONObject("Response").optString("TransactionID"));
         }
 
         //final response.
@@ -192,7 +192,6 @@ public class BillproGateway extends Gateway {
         result = resp.getJSONObject("Response").getInt("ResponseCode");
 
         if (result == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(resp.getJSONObject("Response").getString("Description"));
@@ -200,6 +199,7 @@ public class BillproGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(resp.getJSONObject("Response").get("Description").toString());
+            errorResponse.setTransactionId(resp.getJSONObject("Response").optString("TransactionID"));
         }
 
         //final response.

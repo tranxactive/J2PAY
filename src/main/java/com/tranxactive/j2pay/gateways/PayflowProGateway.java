@@ -46,7 +46,6 @@ public class PayflowProGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if (responseObject.getInt("RESULT") == 0) {
-            httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
             successResponse.setMessage(responseObject.getString("RESPMSG"));
@@ -64,6 +63,7 @@ public class PayflowProGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
         }
 
         //final response.
@@ -89,7 +89,6 @@ public class PayflowProGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if (responseObject.getInt("RESULT") == 0) {
-            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
             successResponse.setMessage(responseObject.getString("RESPMSG"));
@@ -102,6 +101,7 @@ public class PayflowProGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
         }
 
         //final response.
@@ -128,7 +128,6 @@ public class PayflowProGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if (responseObject.getInt("RESULT") == 0) {
-            httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(responseObject.getString("RESPMSG"));
@@ -148,6 +147,7 @@ public class PayflowProGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
         }
 
         //final response.
@@ -174,7 +174,6 @@ public class PayflowProGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if (responseObject.getInt("RESULT") == 0) {
-            httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(responseObject.getString("RESPMSG"));
@@ -182,6 +181,7 @@ public class PayflowProGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
         }
 
         //final response.

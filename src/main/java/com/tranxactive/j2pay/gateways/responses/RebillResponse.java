@@ -14,7 +14,6 @@ import org.json.JSONObject;
  */
 public class RebillResponse extends CoreResponse {
 
-    private String transactionId = null;
     private float amount = 0.0f;
     private JSONObject voidParams = null;
 
@@ -70,20 +69,6 @@ public class RebillResponse extends CoreResponse {
      */
     public void setRefundParams(JSONObject refundParams) {
         this.refundParams = refundParams;
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 
     /**

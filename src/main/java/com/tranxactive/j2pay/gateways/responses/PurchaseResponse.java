@@ -11,7 +11,6 @@ import org.json.JSONObject;
  */
 public class PurchaseResponse extends CoreResponse {
 
-    private String transactionId = null;
     private float amount = 0.0f;
     private JSONObject voidParams = null;
 
@@ -54,7 +53,6 @@ public class PurchaseResponse extends CoreResponse {
         this.cardFirst6 = cardFirst6;
         this.cardLast4 = cardLast4;
         this.maskedCard = maskedCard;
-        this.transactionId = transactionId;
         this.rebillParams = rebillParams;
         this.voidParams = voidParams;
         this.refundParams = refundParams;
@@ -179,20 +177,6 @@ public class PurchaseResponse extends CoreResponse {
         this.setMaskedCard(customerCard.getMaskedCard());
         this.setCardExpiryYear(customerCard.getExpiryYear());
         this.setCardExpiryMonth(customerCard.getExpiryMonth());
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 
     /**

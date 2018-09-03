@@ -50,7 +50,6 @@ public class EasypayGateway extends Gateway {
 
         if ("1".equals(responseObject.getString("response"))) {
 
-            httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -72,6 +71,7 @@ public class EasypayGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.optString("transactionid"));
         }
 
         //final response.
@@ -98,7 +98,6 @@ public class EasypayGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if (responseObject.getString("response").equals("1")) {
-            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -111,6 +110,7 @@ public class EasypayGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.optString("transactionid"));
         }
 
         //final response.
@@ -138,7 +138,6 @@ public class EasypayGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if ("1".equals(responseObject.getString("response"))) {
-            httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -158,6 +157,7 @@ public class EasypayGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.optString("transactionid"));
         }
 
         //final response.
@@ -184,7 +184,6 @@ public class EasypayGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
 
         if ("1".equals(responseObject.getString("response"))) {
-            httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -192,6 +191,7 @@ public class EasypayGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.optString("transactionid"));
         }
 
         //final response.

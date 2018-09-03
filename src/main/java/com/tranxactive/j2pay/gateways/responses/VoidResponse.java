@@ -14,8 +14,6 @@ import org.json.JSONObject;
  */
 public class VoidResponse extends CoreResponse {
 
-    protected String transactionId = null;
-
     public VoidResponse() {
         this.success = true;
     }
@@ -29,20 +27,6 @@ public class VoidResponse extends CoreResponse {
         this.message = message;
         this.transactionId = transactionId;
         this.gatewayResponse = gatewayResponse;
-    }
-
-    /**
-     * @return the transactionId
-     */
-    public String getTransactionId() {
-        return transactionId;
-    }
-
-    /**
-     * @param transactionId the transactionId to set
-     */
-    public void setTransactionId(String transactionId) {
-        this.transactionId = transactionId;
     }
 
     @Override

@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  
-*/
+ */
 package com.tranxactive.j2pay.gateways;
 
 import com.tranxactive.j2pay.gateways.core.Gateway;
@@ -53,7 +53,6 @@ public class AuthorizeGateway extends Gateway {
             if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
                 result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
                 if (result == 1) {
-                    httpResponse.setSuccessful(true);
                     successResponse = new PurchaseResponse();
                     successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
                     successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
@@ -66,7 +65,7 @@ public class AuthorizeGateway extends Gateway {
                                 .put("customerProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").get("customerProfileId").toString())
                                 .put("paymentProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").getJSONObject("customerPaymentProfileIdList").get("numericString").toString())
                         );
-                    }else{
+                    } else {
                         successResponse.setRebillParams(null);
                     }
 
@@ -87,6 +86,19 @@ public class AuthorizeGateway extends Gateway {
             }
         } else {
             errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+        }
+
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
         }
 
         //final response.
@@ -121,13 +133,12 @@ public class AuthorizeGateway extends Gateway {
             if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
                 result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
                 if (result == 1) {
-                    httpResponse.setSuccessful(true);
                     successResponse = new RefundResponse();
-                    
+
                     successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
                     successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
                     successResponse.setAmount(amount);
-                    
+
                     successResponse.setVoidParams(new JSONObject()
                             .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
                     );
@@ -141,6 +152,19 @@ public class AuthorizeGateway extends Gateway {
             errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
 
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
+        }
+        
         //final response.
         processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
@@ -176,9 +200,8 @@ public class AuthorizeGateway extends Gateway {
                     String cardLast4 = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("accountNumber").toString();
                     cardLast4 = cardLast4.substring(cardLast4.length() - 4, cardLast4.length());
 
-                    httpResponse.setSuccessful(true);
                     successResponse = new RebillResponse();
-                    
+
                     successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
                     successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
                     successResponse.setAmount(amount);
@@ -204,6 +227,19 @@ public class AuthorizeGateway extends Gateway {
             errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
 
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
+        }
+        
         //final response.
         processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
@@ -236,7 +272,6 @@ public class AuthorizeGateway extends Gateway {
             if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
                 result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
                 if (result == 1) {
-                    httpResponse.setSuccessful(true);
                     successResponse = new VoidResponse();
 
                     successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
@@ -252,6 +287,19 @@ public class AuthorizeGateway extends Gateway {
             errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
         }
 
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
+        }
+        
         //final response.
         processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;

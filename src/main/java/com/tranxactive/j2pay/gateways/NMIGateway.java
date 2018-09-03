@@ -53,7 +53,6 @@ public class NMIGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
 
         if (responseObject.getInt("response_code") == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new PurchaseResponse();
             successResponse.setMessage(responseObject.getString("responsetext"));
             successResponse.setTransactionId(responseObject.get("transactionid").toString());
@@ -75,6 +74,7 @@ public class NMIGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
         }
 
         //final response.
@@ -109,7 +109,6 @@ public class NMIGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
 
         if (responseObject.getInt("response_code") == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new RefundResponse();
             successResponse.setMessage(responseObject.getString("responsetext"));
             successResponse.setTransactionId(responseObject.get("transactionid").toString());
@@ -120,6 +119,7 @@ public class NMIGateway extends Gateway {
             );
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
         }
 
         //final response.
@@ -152,7 +152,6 @@ public class NMIGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
 
         if (responseObject.getInt("response_code") == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new RebillResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -172,6 +171,7 @@ public class NMIGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
         }
 
         //final response.
@@ -204,7 +204,6 @@ public class NMIGateway extends Gateway {
         responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
 
         if (responseObject.getInt("response_code") == 100) {
-            httpResponse.setSuccessful(true);
             successResponse = new VoidResponse();
 
             successResponse.setMessage(responseObject.getString("responsetext"));
@@ -212,6 +211,7 @@ public class NMIGateway extends Gateway {
 
         } else {
             errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
         }
 
         //final response.
