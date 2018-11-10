@@ -28,6 +28,7 @@ public enum ParamList {
     REFUND_PARAMS("refundParams"),
     VOID_PARAMS("voidParams"),
     REBILL_PARAMS("rebillParams"),
+    CAPTURE_PARAMS("captureParams"),
     
     LIBRARY_RESPONSE("lr"),
     GATEWAY_RESPONSE("gr")

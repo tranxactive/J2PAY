@@ -322,4 +322,19 @@ public class CheckoutGateway extends Gateway {
         return "https://" + (isTestMode() ? "sandbox" : "api2") + ".checkout.com/" + (isTestMode() ? "api2/" : "") + "v2/charges";
     }
 
+    @Override
+    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
+    @Override
+    public JSONObject getCaptureSampleParameters() {
+        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    }
+
 }

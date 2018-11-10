@@ -317,9 +317,7 @@ public class AuthorizeGateway extends Gateway {
     public JSONObject getRefundSampleParameters() {
         return new JSONObject()
                 .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be refunded")
-                .put(ParamList.CARD_LAST_4.getName(), "last 4 digits of card")
-                .put(ParamList.CARD_EXPIRY_MONTH.getName(), "must be 2 digits expiry month of card i.e for jan 01")
-                .put(ParamList.CARD_EXPIRY_YEAR.getName(), "must be 4 digits expiry year of card i.e 2017");
+                .put(ParamList.CARD_LAST_4.getName(), "last 4 digits of card");
     }
 
     @Override
@@ -334,8 +332,233 @@ public class AuthorizeGateway extends Gateway {
         return new JSONObject()
                 .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be void");
     }
+    
+    @Override
+    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        JSONObject resp;
+        String requestString = this.buildAuthorizeParameters(apiParameters, customer, customerCard, currency, amount);
+
+        AuthResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        HTTPResponse httpResponse;
+
+        int result;
+
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        resp = XMLHelper.toJson(httpResponse.getContent());
+
+        if (resp.has("createTransactionResponse")) {
+
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    successResponse = new AuthResponse();
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+                    successResponse.setCardValuesFrom(customerCard);
+                    successResponse.setAmount(amount);
+                    successResponse.setCurrencyCode(currency);
+
+                    if (resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").has("customerProfileId")) {
+                        successResponse.setRebillParams(new JSONObject()
+                                .put("customerProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").get("customerProfileId").toString())
+                                .put("paymentProfileId", resp.getJSONObject("createTransactionResponse").getJSONObject("profileResponse").getJSONObject("customerPaymentProfileIdList").get("numericString").toString())
+                        );
+                    } else {
+                        successResponse.setRebillParams(null);
+                    }                    
+
+                    successResponse.setVoidParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
+                    
+                    successResponse.setCaptureParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
+                    
+
+                } else {
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                }
+            } else {
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+            }
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+        }
+
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
+        }
+
+        //final response.
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }
+
+    @Override
+    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+
+        JSONObject resp;
+
+        String requestString = this.buildCaptureParameters(apiParameters, captureParameters, amount);
+
+        CaptureResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        HTTPResponse httpResponse;
+
+        int result;
+
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        resp = XMLHelper.toJson(httpResponse.getContent());
+
+        if (resp.has("createTransactionResponse")) {
+
+            if (resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject) {
+                result = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getInt("responseCode");
+                if (result == 1) {
+                    
+                    String cardLast4 = resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("accountNumber").toString();
+                    cardLast4 = cardLast4.substring(cardLast4.length() - 4, cardLast4.length());
+                    
+                    successResponse = new CaptureResponse();
+
+                    successResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("messages").getJSONObject("message").getString("description"));
+                    successResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString());
+                    successResponse.setAmount(amount);
+
+                    successResponse.setVoidParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                    );
+                    
+                    successResponse.setRefundParams(new JSONObject()
+                            .put(ParamList.TRANSACTION_ID.getName(), resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").get("transId").toString())
+                            .put(ParamList.CARD_LAST_4.getName(), cardLast4)
+                    );
+                    
+                } else {
+                    errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").getJSONObject("errors").getJSONObject("error").getString("errorText"));
+                }
+            } else {
+                errorResponse.setMessage(resp.getJSONObject("createTransactionResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+            }
+        } else {
+            errorResponse.setMessage(resp.getJSONObject("ErrorResponse").getJSONObject("messages").getJSONObject("message").getString("text"));
+        }
+
+        if (successResponse == null) {
+
+            if (resp.has("createTransactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").has("transactionResponse")
+                    && resp.getJSONObject("createTransactionResponse").get("transactionResponse") instanceof JSONObject
+                    && resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").has("transId")) {
+                
+                errorResponse.setTransactionId(resp.getJSONObject("createTransactionResponse").getJSONObject("transactionResponse").optString("transId"));
+
+            }
+
+        }
+        
+        //final response.
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }
+
+    @Override
+    public JSONObject getCaptureSampleParameters() {
+        return new JSONObject()
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be captured");
+    }
 
     //private methods are starting below.
+    private String buildAuthorizeParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        StringBuilder finalParams = new StringBuilder();
+
+        finalParams
+                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
+                .append("<merchantAuthentication>")
+                .append("<name>").append(apiParameters.getString("name")).append("</name>")
+                .append("<transactionKey>").append(apiParameters.getString("transactionKey")).append("</transactionKey>")
+                .append("</merchantAuthentication>")
+                .append("<transactionRequest>")
+                .append("<transactionType>").append("authOnlyTransaction").append("</transactionType>")
+                .append("<amount>").append(Float.toString(amount)).append("</amount>")
+                .append("<payment>")
+                .append("<creditCard>")
+                .append("<cardNumber>").append(customerCard.getNumber()).append("</cardNumber>")
+                .append("<expirationDate>").append(customerCard.getExpiryMonth()).append(customerCard.getExpiryYear().substring(2)).append("</expirationDate>")
+                .append("<cardCode>").append(customerCard.getCvv()).append("</cardCode>")
+                .append("</creditCard>")
+                .append("</payment>")
+                .append("<profile>")
+                .append("<createProfile>").append(true).append("</createProfile>")
+                .append("</profile>")
+                .append("<customer>")
+                .append("<id>").append(getUniqueCustomerId()).append("</id>")
+                .append("<email>").append(customer.getEmail()).append("</email>")
+                .append("</customer>")
+                .append("<billTo>")
+                .append("<firstName>").append(customer.getFirstName()).append("</firstName>")
+                .append("<lastName>").append(customer.getLastName()).append("</lastName>")
+                .append("<address>").append(customer.getAddress()).append("</address>")
+                .append("<city>").append(customer.getCity()).append("</city>")
+                .append("<state>").append(customer.getState()).append("</state>")
+                .append("<zip>").append(customer.getZip()).append("</zip>")
+                .append("<country>").append(customer.getCountry().getCodeISO3()).append("</country>")
+                .append("<phoneNumber>").append(customer.getPhoneNumber()).append("</phoneNumber>")
+                .append("</billTo>")
+                .append("<customerIP>").append(customer.getIp()).append("</customerIP>")
+                .append("</transactionRequest>")
+                .append("</createTransactionRequest>");
+
+        return finalParams.toString();
+
+    }
+    
+    private String buildCaptureParameters(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+
+        StringBuilder finalParams = new StringBuilder();
+
+        finalParams
+                .append("<createTransactionRequest xmlns='AnetApi/xml/v1/schema/AnetApiSchema.xsd'>")
+                .append("<merchantAuthentication>")
+                .append("<name>").append(apiParameters.getString("name")).append("</name>")
+                .append("<transactionKey>").append(apiParameters.getString("transactionKey")).append("</transactionKey>")
+                .append("</merchantAuthentication>")
+                .append("<transactionRequest>")
+                .append("<transactionType>").append("priorAuthCaptureTransaction").append("</transactionType>")
+                .append("<amount>").append(Float.toString(amount)).append("</amount>")                
+                .append("<refTransId>").append(captureParameters.getString(ParamList.TRANSACTION_ID.getName())).append("</refTransId>")
+                .append("</transactionRequest>")
+                .append("</createTransactionRequest>");
+
+        return finalParams.toString();
+
+    }
+    
     private String buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
         StringBuilder finalParams = new StringBuilder();
@@ -397,7 +620,7 @@ public class AuthorizeGateway extends Gateway {
                 .append("<payment>")
                 .append("<creditCard>")
                 .append("<cardNumber>").append(refundParameters.getString(ParamList.CARD_LAST_4.getName())).append("</cardNumber>")
-                .append("<expirationDate>XXXX")/*.append(refundParameters.getString(ParamList.CARD_EXPIRY_MONTH.getName())).append(refundParameters.getString(ParamList.CARD_EXPIRY_YEAR.getName()).substring(2))*/.append("</expirationDate>")
+                .append("<expirationDate>XXXX").append("</expirationDate>")
                 .append("</creditCard>")
                 .append("</payment>")
                 .append("<refTransId>").append(refundParameters.getString(ParamList.TRANSACTION_ID.getName())).append("</refTransId>")

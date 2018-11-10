@@ -28,6 +28,50 @@ public abstract class Gateway implements GatewaySampleParameters {
     }
 
     /**
+     * This method Authorize the credit card.
+     *
+     * @param apiParameters the gateway specific parameters required in all kind
+     * of merchant interactions. you can get its sample by calling
+     * getApiSampleParameters method of this class and then pass the same object
+     * after populating values.<br>
+     * @param customer the Customer information. i.e. first name, last name ,
+     * zip.<br>
+     * @param customerCard the Customer credit card info like card number, cvv.
+     * currency in which card will be charged and amount which will be charged.
+     * @param currency the currency in which amount will be charged.
+     * @param amount the amount which will be charged.
+     * @return the HTTPResponse class.
+     *
+     * @see JSONObject
+     * @see Customer
+     * @see CustomerCard
+     * @see HTTPResponse
+     *
+     */
+    public abstract HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount);
+    
+    /**
+     * This method captures the previously authorized transaction.
+     *
+     * @param apiParameters the gateway specific parameters required in all kind
+     * of merchant interactions. you can get its sample by calling
+     * getApiSampleParameters method of this class and then pass the same object
+     * after populating values.<br>
+     * @param captureParameters the capture parameters you can get its sample by
+     * calling getCaptureSampleParameters method of this class and then pass the
+     * same object after populating values.<br>     
+     * @param amount the amount which will be charged.
+     * @return the HTTPResponse class.
+     *
+     * @see JSONObject
+     * @see Customer
+     * @see CustomerCard
+     * @see HTTPResponse
+     *
+     */
+    public abstract HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount);
+    
+    /**
      * This method Authorize and Charge the credit card in one step.
      *
      * @param apiParameters the gateway specific parameters required in all kind

@@ -27,4 +27,6 @@ interface GatewaySampleParameters {
     JSONObject getRebillSampleParameters();
 
     JSONObject getVoidSampleParameters();
+    
+    JSONObject getCaptureSampleParameters();
 }
