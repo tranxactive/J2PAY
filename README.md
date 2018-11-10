@@ -37,15 +37,15 @@ You can see J2Pay official documentation and contributors guide on [j2pay.org](h
 
 The following gateways are available.
 
-#| Gateway | Recurring Support | AUTH + CAPTURE | Maintainer
---- | --- | --- | ---
-1 | Authorize | ✓ | ✓| [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+#| Gateway | Recurring Support | Auth + Capture | Maintainer
+--- | --- | --- | --- | ---
+1 | Authorize | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 2 | NMI | ✓ | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 3 | PAYEEZY | x | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 4 | PAYFLOW PRO | ✓ | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-5 | BillPro | ✓ | x |[Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
-6 | EasyPay | ✓ | x |[Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
-7 | Checkout | ✓ | x |[Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+5 | BillPro | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+6 | EasyPay | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+7 | Checkout | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 
 **`Note`** if your desired gateway is not in list you are free to create an issue and we will integrate that gateway for you. or you can also write us at info@tranxactive.com
 
