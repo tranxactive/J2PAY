@@ -40,7 +40,7 @@ The following gateways are available.
 #| Gateway | Recurring Support | Auth + Capture | Maintainer
 --- | --- | --- | --- | ---
 1 | Authorize | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-2 | NMI | ✓ | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+2 | NMI | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 3 | PAYEEZY | x | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 4 | PAYFLOW PRO | ✓ | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 5 | BillPro | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
