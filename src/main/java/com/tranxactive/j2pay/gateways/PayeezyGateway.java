@@ -10,6 +10,8 @@ import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
 import com.tranxactive.j2pay.gateways.parameters.CustomerCard;
 import com.tranxactive.j2pay.gateways.parameters.ParamList;
+import com.tranxactive.j2pay.gateways.responses.AuthResponse;
+import com.tranxactive.j2pay.gateways.responses.CaptureResponse;
 import com.tranxactive.j2pay.gateways.responses.ErrorResponse;
 import com.tranxactive.j2pay.gateways.responses.PurchaseResponse;
 import com.tranxactive.j2pay.gateways.responses.RefundResponse;
@@ -163,8 +165,8 @@ public class PayeezyGateway extends Gateway {
                 successResponse.setTransactionId(resp.getJSONObject("TransactionResult").get("Transaction_Tag").toString());
 
             } else {
-               errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
-               errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
+                errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
             }
 
         } else {
@@ -174,6 +176,113 @@ public class PayeezyGateway extends Gateway {
         //final response.
         processFinalResponse(resp, httpResponse, successResponse, errorResponse);
         return httpResponse;
+    }
+
+    @Override
+    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        JSONObject resp = null;
+        String requestString = this.buildAuthParameters(apiParameters, customer, customerCard, currency, amount);
+
+        AuthResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        if (httpResponse.getContent().trim().startsWith("<")) {
+            resp = XMLHelper.toJson(httpResponse.getContent());
+            boolean transactionError = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Error");
+            boolean transactionApproved = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Approved");
+
+            if (transactionApproved) {
+                successResponse = new AuthResponse();
+
+                successResponse.setMessage(resp.getJSONObject("TransactionResult").getString("Bank_Message"));
+                successResponse.setTransactionId(resp.getJSONObject("TransactionResult").get("Transaction_Tag").toString());
+                successResponse.setAmount(amount);
+                successResponse.setCurrencyCode(currency);
+                successResponse.setCardValuesFrom(customerCard);
+
+                successResponse.setVoidParams(new JSONObject()
+                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put("authorizationNumber", resp.getJSONObject("TransactionResult").get("Authorization_Num").toString())
+                        .put(ParamList.AMOUNT.getName(), amount)
+                );
+                
+                successResponse.setCaptureParams(new JSONObject()
+                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put("authorizationNumber", resp.getJSONObject("TransactionResult").get("Authorization_Num").toString())
+                );
+
+            } else {
+                errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
+            }
+
+        } else {
+            errorResponse.setMessage(httpResponse.getContent());
+        }
+
+        //final response.
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }
+
+    @Override
+    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+        
+        JSONObject resp = null;
+        String requestString = this.buildCaptureParameters(apiParameters, captureParameters, amount);
+
+        CaptureResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        HTTPResponse httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, ContentType.APPLICATION_XML);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        if (httpResponse.getContent().trim().startsWith("<")) {
+            resp = XMLHelper.toJson(httpResponse.getContent());
+            boolean transactionError = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Error");
+            boolean transactionApproved = resp.getJSONObject("TransactionResult").getBoolean("Transaction_Approved");
+
+            if (transactionApproved) {
+                successResponse = new CaptureResponse();
+
+                successResponse.setMessage(resp.getJSONObject("TransactionResult").getString("Bank_Message"));
+                successResponse.setTransactionId(resp.getJSONObject("TransactionResult").get("Transaction_Tag").toString());
+                successResponse.setAmount(amount);
+
+                successResponse.setRefundParams(new JSONObject()
+                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put("authorizationNumber", resp.getJSONObject("TransactionResult").get("Authorization_Num").toString())
+                );
+                
+                successResponse.setVoidParams(new JSONObject()
+                        .put(ParamList.TRANSACTION_ID.getName(), successResponse.getTransactionId())
+                        .put("authorizationNumber", resp.getJSONObject("TransactionResult").get("Authorization_Num").toString())
+                        .put(ParamList.AMOUNT.getName(), amount)
+                );
+
+            } else {
+                errorResponse.setMessage(resp.getJSONObject("TransactionResult").get(transactionError ? "EXact_Message" : "Bank_Message").toString());
+                errorResponse.setTransactionId(resp.getJSONObject("TransactionResult").optString("Transaction_Tag"));
+            }
+
+        } else {
+            errorResponse.setMessage(httpResponse.getContent());
+        }
+
+        //final response.
+        processFinalResponse(resp, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+
     }
 
     @Override
@@ -203,6 +312,13 @@ public class PayeezyGateway extends Gateway {
                 .put("authorizationNumber", "the authorization number provided in purchase transaction")
                 .put(ParamList.AMOUNT.getName(), "the actual amount of original transaction");
 
+    }
+
+    @Override
+    public JSONObject getCaptureSampleParameters() {
+        return new JSONObject()
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be captured")
+                .put("authorizationNumber", "the authorization number provided in authorize transaction");
     }
 
     //private methods are starting below.
@@ -269,25 +385,52 @@ public class PayeezyGateway extends Gateway {
         return finalParams.toString();
     }
 
+    private String buildAuthParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
+        StringBuilder finalParams = new StringBuilder();
+
+        finalParams
+                .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+                .append("<Transaction>")
+                .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
+                .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
+                .append("<Transaction_Type>01</Transaction_Type>")
+                .append("<DollarAmount>").append(Float.toString(amount)).append("</DollarAmount>")
+                .append("<Currency>").append(currency).append("</Currency>")
+                .append("<CardHoldersName>").append(customerCard.getName()).append("</CardHoldersName>")
+                .append("<Card_Number>").append(customerCard.getNumber()).append("</Card_Number>")
+                .append("<VerificationStr2>").append(customerCard.getCvv()).append("</VerificationStr2>")
+                .append("<CVD_Presence_Ind>1</CVD_Presence_Ind>")
+                .append("<Expiry_Date>").append(customerCard.getExpiryMonth()).append(customerCard.getExpiryYear().substring(2)).append("</Expiry_Date>")
+                .append("<Client_IP>").append(customer.getIp()).append("</Client_IP>")
+                .append("<Client_Email>").append(customer.getEmail()).append("</Client_Email>")
+                .append("<VerificationStr1>").append(customer.getAddress()).append("|").append(customer.getZip()).append("|").append(customer.getCity()).append("|").append(customer.getState()).append("|").append(customer.getCountry().getCodeISO2()).append("</VerificationStr1>")
+                .append("</Transaction>");
+
+        return finalParams.toString();
+
+    }
+    
+    private String buildCaptureParameters(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+        
+        StringBuilder finalParams = new StringBuilder();
+
+        finalParams
+                .append("<?xml version=\"1.0\" encoding=\"UTF-8\"?>")
+                .append("<Transaction>")
+                .append("<ExactID>").append(apiParameters.getString("exactId")).append("</ExactID>")
+                .append("<Password>").append(apiParameters.getString("password")).append("</Password>")
+                .append("<Transaction_Type>32</Transaction_Type>")
+                .append("<DollarAmount>").append(amount).append("</DollarAmount>")
+                .append("<Transaction_Tag>").append(captureParameters.get(ParamList.TRANSACTION_ID.getName()).toString()).append("</Transaction_Tag>")
+                .append("<Authorization_Num>").append(captureParameters.get("authorizationNumber").toString()).append("</Authorization_Num>")
+                .append("</Transaction>");
+
+        return finalParams.toString();
+    }
 
     private String getApiURL() {
-        return "https://api." + (isTestMode()? "demo." : "") + "globalgatewaye4.firstdata.com/transaction/v11";
-    }
-
-    @Override
-    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public JSONObject getCaptureSampleParameters() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "https://api." + (isTestMode() ? "demo." : "") + "globalgatewaye4.firstdata.com/transaction/v11";
     }
 
 }
