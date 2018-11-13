@@ -42,7 +42,7 @@ The following gateways are available.
 1 | Authorize | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 2 | NMI | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 3 | PAYEEZY | x | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-4 | PAYFLOW PRO | ✓ | x | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+4 | PAYFLOW PRO | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 5 | BillPro | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 6 | EasyPay | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 7 | Checkout | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
