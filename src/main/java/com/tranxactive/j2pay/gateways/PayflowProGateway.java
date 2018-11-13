@@ -111,7 +111,7 @@ public class PayflowProGateway extends Gateway {
 
     @Override
     public HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
-        
+
         String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildRebillParameters(apiParameters, rebillParameters, amount)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
@@ -137,7 +137,7 @@ public class PayflowProGateway extends Gateway {
             successResponse.setRebillParams(new JSONObject()
                     .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
-            
+
             successResponse.setRefundParams(new JSONObject()
                     .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
             );
@@ -157,7 +157,7 @@ public class PayflowProGateway extends Gateway {
 
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
-        
+
         String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildVoidParameters(apiParameters, voidParameters)));
         JSONObject responseObject;
         HTTPResponse httpResponse;
@@ -178,6 +178,95 @@ public class PayflowProGateway extends Gateway {
 
             successResponse.setMessage(responseObject.getString("RESPMSG"));
             successResponse.setTransactionId(responseObject.get("PNREF").toString());
+
+        } else {
+            errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
+        }
+
+        //final response.
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }
+
+    @Override
+    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildAuthorizeParameters(apiParameters, customer, customerCard, currency, amount)));
+        JSONObject responseObject;
+        HTTPResponse httpResponse;
+
+        AuthResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
+
+        if (responseObject.getInt("RESULT") == 0) {
+            successResponse = new AuthResponse();
+
+            successResponse.setMessage(responseObject.getString("RESPMSG"));
+            successResponse.setTransactionId(responseObject.get("PNREF").toString());
+            successResponse.setCardValuesFrom(customerCard);
+            successResponse.setAmount(amount);
+            successResponse.setCurrencyCode(currency);
+
+            successResponse.setRebillParams(
+                    new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            );
+            successResponse.setVoidParams(
+                    new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            );
+            successResponse.setCaptureParams(
+                    new JSONObject().put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            );
+
+        } else {
+            errorResponse.setMessage(responseObject.getString("RESPMSG"));
+            errorResponse.setTransactionId(responseObject.optString("PNREF"));
+        }
+
+        //final response.
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }
+
+    @Override
+    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+
+        String requestString = QueryStringHelper.toQueryString(JSONHelper.encode(this.buildCaptureParameters(apiParameters, captureParameters, amount)));
+        JSONObject responseObject;
+        HTTPResponse httpResponse;
+
+        CaptureResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        httpResponse = HTTPClient.httpPost(this.getApiURL(), requestString, APPLICATION_FORM_URLENCODED);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(httpResponse.getContent()));
+
+        if (responseObject.getInt("RESULT") == 0) {
+            successResponse = new CaptureResponse();
+
+            successResponse.setMessage(responseObject.getString("RESPMSG"));
+            successResponse.setTransactionId(responseObject.get("PNREF").toString());
+            successResponse.setAmount(amount);
+
+            successResponse.setRefundParams(new JSONObject()
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            );
+            successResponse.setVoidParams(new JSONObject()
+                    .put(TRANSACTION_ID.getName(), responseObject.get("PNREF").toString())
+            );
 
         } else {
             errorResponse.setMessage(responseObject.getString("RESPMSG"));
@@ -216,6 +305,12 @@ public class PayflowProGateway extends Gateway {
                 .put(TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
     }
 
+    @Override
+    public JSONObject getCaptureSampleParameters() {
+        return new JSONObject()
+                .put(TRANSACTION_ID.getName(), "the transaction id also known as ORIGID/PNREF");
+    }
+
     private JSONObject buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
         return new JSONObject()
@@ -240,8 +335,7 @@ public class PayflowProGateway extends Gateway {
                 .put("VERBOSITY", "HIGH")
                 .put("RECURRING", "Y")
                 .put("PROFILENAME", getUniqueCustomerId())
-                .put("ACTION", "A")
-                ;
+                .put("ACTION", "A");
     }
 
     private JSONObject buildVoidParameters(JSONObject apiParameters, JSONObject voidParameters) {
@@ -281,23 +375,49 @@ public class PayflowProGateway extends Gateway {
                 .put("RECURRING", "Y");
     }
 
+    private JSONObject buildAuthorizeParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        return new JSONObject()
+                .put("TRXTYPE", "A")
+                .put("TENDER", "C")
+                .put("USER", apiParameters.getString("USER"))
+                .put("VENDOR", apiParameters.getString("VENDOR"))
+                .put("PWD", apiParameters.getString("PWD"))
+                .put("PARTNER", apiParameters.getString("PARTNER"))
+                .put("ACCT", customerCard.getNumber())
+                .put("CVV2", customerCard.getCvv())
+                .put("EXPDATE", customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
+                .put("AMT", amount)
+                .put("BILLTOFIRSTNAME", customer.getFirstName())
+                .put("BILLTOLASTNAME", customer.getLastName())
+                .put("BILLTOSTREET", customer.getAddress())
+                .put("BILLTOCITY", customer.getCity())
+                .put("BILLTOSTATE", customer.getState())
+                .put("BILLTOZIP", customer.getZip())
+                .put("BILLTOCOUNTRY", customer.getCountry().getNumericCode())
+                .put("CUSTIP", customer.getIp())
+                .put("VERBOSITY", "HIGH")
+                .put("RECURRING", "Y")
+                .put("PROFILENAME", getUniqueCustomerId())
+                .put("ACTION", "A");
+    }
+
+    private JSONObject buildCaptureParameters(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+
+        return new JSONObject()
+                .put("TRXTYPE", "D")
+                .put("TENDER", "C")
+                .put("USER", apiParameters.getString("USER"))
+                .put("VENDOR", apiParameters.getString("VENDOR"))
+                .put("PWD", apiParameters.getString("PWD"))
+                .put("PARTNER", apiParameters.getString("PARTNER"))
+                .put("ORIGID", captureParameters.getString(TRANSACTION_ID.getName()))
+                .put("AMT", amount)
+                .put("VERBOSITY", "HIGH");
+    }
+
     private String getApiURL() {
-            return "https://" + (this.isTestMode() ? "pilot-" : "") + "payflowpro.paypal.com";
-    }
-
-    @Override
-    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
-    @Override
-    public JSONObject getCaptureSampleParameters() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return "https://" + (this.isTestMode() ? "pilot-" : "") + "payflowpro.paypal.com";
     }
 
 }
