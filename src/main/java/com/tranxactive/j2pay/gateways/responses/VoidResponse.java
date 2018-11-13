@@ -15,7 +15,6 @@ import org.json.JSONObject;
 public class VoidResponse extends CoreResponse {
 
     public VoidResponse() {
-        this.success = true;
     }
 
     public VoidResponse(
@@ -23,7 +22,6 @@ public class VoidResponse extends CoreResponse {
             String transactionId,
             JSONObject gatewayResponse
     ) {
-        this.success = true;
         this.message = message;
         this.transactionId = transactionId;
         this.gatewayResponse = gatewayResponse;

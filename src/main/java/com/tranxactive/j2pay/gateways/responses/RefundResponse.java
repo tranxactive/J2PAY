@@ -18,7 +18,6 @@ public class RefundResponse extends CoreResponse {
     private JSONObject voidParams = null;
 
     public RefundResponse() {
-        this.success = true;
     }
 
     public RefundResponse(
@@ -28,7 +27,6 @@ public class RefundResponse extends CoreResponse {
             JSONObject voidParams,
             JSONObject gatewayResponse
     ) {
-        this.success = true;
         this.message = message;
         this.amount = amount;
         this.transactionId = transactionId;

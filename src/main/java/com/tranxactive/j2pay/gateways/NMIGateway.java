@@ -218,6 +218,109 @@ public class NMIGateway extends Gateway {
         processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
         return httpResponse;
     }
+    
+      @Override
+    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+
+        JSONObject requestObject = this.buildAuthorizeParameters(apiParameters, customer, customerCard, currency, amount);
+        JSONObject responseObject;
+        String requestString;
+        String responseString;
+
+        requestObject = JSONHelper.encode(requestObject);
+        requestString = QueryStringHelper.toQueryString(requestObject);
+        HTTPResponse httpResponse;
+
+        AuthResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+
+        if (responseObject.getInt("response_code") == 100) {
+            successResponse = new AuthResponse();
+            successResponse.setMessage(responseObject.getString("responsetext"));
+            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setCardValuesFrom(customerCard);
+            successResponse.setAmount(amount);
+            successResponse.setCurrencyCode(currency);
+
+            successResponse.setRebillParams(new JSONObject()
+                    .put("customerVaultId", responseObject.get("customer_vault_id").toString())
+            );
+
+            successResponse.setVoidParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
+            
+            successResponse.setCaptureParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
+
+        } else {
+            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
+        }
+
+        //final response.
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+
+    }
+
+    @Override
+    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
+
+        JSONObject requestObject = this.buildCaptureParameters(apiParameters, captureParameters, amount);
+        JSONObject responseObject;
+        String requestString;
+        String responseString;
+        requestObject = JSONHelper.encode(requestObject);
+        requestString = QueryStringHelper.toQueryString(requestObject);
+        HTTPResponse httpResponse;
+
+        CaptureResponse successResponse = null;
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        httpResponse = HTTPClient.httpPost(this.apiURL, requestString, ContentType.APPLICATION_FORM_URLENCODED);
+
+        if (httpResponse.getStatusCode() == -1) {
+            return httpResponse;
+        }
+
+        responseString = httpResponse.getContent();
+        responseObject = JSONHelper.decode(QueryStringHelper.toJson(responseString));
+
+        if (responseObject.getInt("response_code") == 100) {
+            successResponse = new CaptureResponse();
+
+            successResponse.setMessage(responseObject.getString("responsetext"));
+            successResponse.setTransactionId(responseObject.get("transactionid").toString());
+            successResponse.setAmount(amount);
+
+            successResponse.setRefundParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
+
+            successResponse.setVoidParams(new JSONObject()
+                    .put(ParamList.TRANSACTION_ID.getName(), responseObject.get("transactionid").toString())
+            );
+
+        } else {
+            errorResponse.setMessage(responseObject.getString("responsetext"));
+            errorResponse.setTransactionId(responseObject.has("transactionid") ? responseObject.getString("transactionid") : null);
+        }
+
+        //final response.
+        processFinalResponse(responseObject, httpResponse, successResponse, errorResponse);
+        return httpResponse;
+    }    
 
     @Override
     public JSONObject getApiSampleParameters() {
@@ -241,6 +344,12 @@ public class NMIGateway extends Gateway {
     public JSONObject getVoidSampleParameters() {
         return new JSONObject()
                 .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be void");
+    }   
+    
+    @Override
+    public JSONObject getCaptureSampleParameters() {
+        return new JSONObject()
+                .put(ParamList.TRANSACTION_ID.getName(), "the transaction id which will be captured");
     }
 
     //private methods are starting below.
@@ -308,20 +417,45 @@ public class NMIGateway extends Gateway {
 
         return object;
     }
+    
+    private JSONObject buildAuthorizeParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-    @Override
-    public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        JSONObject object = new JSONObject();
+        object
+                .put("type", "auth")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("ccnumber", customerCard.getNumber())
+                .put("ccexp", customerCard.getExpiryMonth() + customerCard.getExpiryYear().substring(2))
+                .put("cvv", customerCard.getCvv())
+                .put("amount", amount)
+                .put("currency", currency)
+                .put("first_name", customer.getFirstName())
+                .put("last_name", customer.getLastName())
+                .put("address1", customer.getAddress())
+                .put("city", customer.getCity())
+                .put("state", customer.getState())
+                .put("zip", customer.getZip())
+                .put("country", customer.getCountry().getCodeISO2())
+                .put("phone", customer.getPhoneNumber())
+                .put("email", customer.getEmail())
+                .put("ipaddress", customer.getIp())
+                .put("customer_vault", "add_customer");
+
+        return object;
+
     }
+    
+    private JSONObject buildCaptureParameters(JSONObject apiParameters, JSONObject captureParameters, float amount) {
 
-    @Override
-    public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        JSONObject object = new JSONObject();
+        object
+                .put("type", "capture")
+                .put("username", apiParameters.getString("username"))
+                .put("password", apiParameters.getString("password"))
+                .put("transactionid", captureParameters.getString(ParamList.TRANSACTION_ID.getName()))
+                .put("amount", Float.toString(amount));
+
+        return object;
     }
-
-    @Override
-    public JSONObject getCaptureSampleParameters() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
-    }
-
 }

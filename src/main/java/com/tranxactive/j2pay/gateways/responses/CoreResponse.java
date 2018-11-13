@@ -8,7 +8,7 @@ import org.json.JSONObject;
  */
 public abstract class CoreResponse {
 
-    protected boolean success = false;
+    protected boolean success = true;
     protected String transactionId = null;
     protected String message = null;
     protected JSONObject gatewayResponse = null;

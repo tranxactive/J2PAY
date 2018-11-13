@@ -13,16 +13,18 @@ import org.json.JSONObject;
  * @author ilyas
  */
 public class ErrorResponse extends CoreResponse {
-    
-    public ErrorResponse() { }
-    
+
+    public ErrorResponse() {
+        this.success = false;
+    }
+
     @Override
     public JSONObject getResponse() {
         return new JSONObject()
                 .put(ParamList.LIBRARY_RESPONSE.getName(), new JSONObject()
                         .put(ParamList.SUCCESS.getName(), this.success)
                         .put(ParamList.MESSAGE.getName(), this.message)
-                        .put(ParamList.TRANSACTION_ID.getName(), this.getTransactionId() != null ? this.getTransactionId(): JSONObject.NULL)
+                        .put(ParamList.TRANSACTION_ID.getName(), this.getTransactionId() != null ? this.getTransactionId() : JSONObject.NULL)
                 )
                 .put(ParamList.GATEWAY_RESPONSE.getName(), this.gatewayResponse != null ? this.gatewayResponse : JSONObject.NULL);
     }

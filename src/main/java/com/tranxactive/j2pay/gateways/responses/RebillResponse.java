@@ -21,7 +21,6 @@ public class RebillResponse extends CoreResponse {
     private JSONObject refundParams = null;
 
     public RebillResponse() {
-        this.success = true;
     }
 
     public RebillResponse(
@@ -33,7 +32,6 @@ public class RebillResponse extends CoreResponse {
             JSONObject refundParams,
             JSONObject gatewayResponse
     ) {
-        this.success = true;
         this.message = message;
         this.amount = amount;
         this.transactionId = transactionId;

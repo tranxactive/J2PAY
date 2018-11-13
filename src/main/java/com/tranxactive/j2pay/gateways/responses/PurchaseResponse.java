@@ -26,7 +26,6 @@ public class PurchaseResponse extends CoreResponse {
     private JSONObject refundParams = null;
 
     public PurchaseResponse() {
-        this.success = true;
     }
 
     public PurchaseResponse(
@@ -44,7 +43,6 @@ public class PurchaseResponse extends CoreResponse {
             JSONObject refundParams,
             JSONObject gatewayResponse
     ) {
-        this.success = true;
         this.message = message;
         this.amount = amount;
         this.currencyCode = currencyCode;

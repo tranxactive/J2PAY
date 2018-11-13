@@ -26,7 +26,6 @@ public class AuthResponse extends CoreResponse {
     private JSONObject captureParams = null;
 
     public AuthResponse() {
-        this.success = true;
     }
 
     public AuthResponse(
@@ -44,7 +43,6 @@ public class AuthResponse extends CoreResponse {
             JSONObject voidParams,
             JSONObject gatewayResponse
     ) {
-        this.success = true;
         this.message = message;
         this.amount = amount;
         this.currencyCode = currencyCode;
