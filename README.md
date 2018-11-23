@@ -1,8 +1,20 @@
 # J2Pay
 
-**version 2.7.7**
+**version 2.7.8**
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
+
+**Whats new in 2.7.8**
+
+J2pay now supports Authorize and Capture transactions.
+Below is the list of all the transaction types supported now.
+
+1. Authorize
+2. Capture
+3. Purchase (Authorize + Capture in one step)
+4. Refund
+5. Recurring
+6. Void
 
 ## Why use J2Pay
 
