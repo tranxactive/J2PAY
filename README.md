@@ -1,6 +1,6 @@
 # J2Pay
 
-**version 2.7.8**
+**version 2.8.8**
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
 
@@ -58,6 +58,7 @@ The following gateways are available.
 5 | BillPro | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 6 | EasyPay | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 7 | Checkout | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+8 | Stripe | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 
 **`Note`** if your desired gateway is not in list you are free to create an issue and we will integrate that gateway for you. or you can also write us at info@tranxactive.com
 
