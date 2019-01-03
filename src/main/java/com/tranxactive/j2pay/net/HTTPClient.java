@@ -18,6 +18,8 @@ import org.apache.http.util.EntityUtils;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.util.HashMap;
+import org.apache.commons.codec.binary.Base64;
+import org.apache.http.HttpHeaders;
 
 import static org.apache.http.entity.ContentType.create;
 
@@ -83,6 +85,53 @@ public class HTTPClient {
                 });
             }
 
+            startTime = System.currentTimeMillis();
+
+            CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpPost);
+
+            endTime = System.currentTimeMillis();
+
+            hTTPResponse = new HTTPResponse(closeableHttpResponse.getStatusLine().getStatusCode(), EntityUtils.toString(closeableHttpResponse.getEntity()).replaceFirst("^\uFEFF", ""), endTime - startTime);
+            hTTPResponse.setRequestString(postParams);
+            EntityUtils.consume(closeableHttpResponse.getEntity());
+        } catch (IOException e) {
+            ErrorResponse errorResponse = new ErrorResponse();
+            errorResponse.setMessage("could not connect to host");
+            return new HTTPResponse(-1, errorResponse.getResponse().toString(), System.currentTimeMillis() - startTime);
+        }
+        return hTTPResponse;
+
+    }
+    
+    /**
+     * This method is the wrapper of apache http client post request with basic Auth.
+     *
+     * @param url The url on which the request will be hit.
+     * @param postParams parameters which will be passed for post.
+     * @param contentType content-type in which data will be posted.
+     * @param charset the charset in which request will be posted if null is
+     * provided contentType charset will be used.
+     * @param authUserName the Auth username
+     * @param authPassword the Auth passord
+     * @return The HTTPResponse class.
+     * @see com.tranxactive.j2pay.net.HTTPResponse
+     * @see ContentType
+     */
+    public static HTTPResponse httpPostWithBasicAuth(String url, String postParams, ContentType contentType, Charset charset, String authUserName, String authPassword) {
+
+        HTTPResponse hTTPResponse;
+
+        long startTime = System.currentTimeMillis(), endTime;
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost httpPost = new HttpPost(url);
+            httpPost.setEntity(new StringEntity(postParams));
+            httpPost.addHeader("Content-Type", charset == null ? contentType.toString() : create(contentType.getMimeType(), charset).toString());
+
+            String auth = authUserName + ":" + authPassword;
+            byte[] encodedAuth = Base64.encodeBase64(auth.getBytes(Charset.forName("US-ASCII")));
+            String authHeader = "Basic " + new String(encodedAuth);
+            httpPost.addHeader(HttpHeaders.AUTHORIZATION, authHeader);
+            
             startTime = System.currentTimeMillis();
 
             CloseableHttpResponse closeableHttpResponse = httpClient.execute(httpPost);

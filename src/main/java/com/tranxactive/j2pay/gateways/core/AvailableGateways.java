@@ -6,21 +6,13 @@
 package com.tranxactive.j2pay.gateways.core;
 
 import com.tranxactive.j2pay.gateways.AuthorizeGateway;
-
 import com.tranxactive.j2pay.gateways.NMIGateway;
-
 import com.tranxactive.j2pay.gateways.PayeezyGateway;
-
 import com.tranxactive.j2pay.gateways.PayflowProGateway;
-
 import com.tranxactive.j2pay.gateways.BillproGateway;
-
 import com.tranxactive.j2pay.gateways.EasypayGateway;
-
 import com.tranxactive.j2pay.gateways.CheckoutGateway;
-
-
-
+import com.tranxactive.j2pay.gateways.StripeGateway;
 
 /**
  *
@@ -34,10 +26,11 @@ public enum AvailableGateways {
     PAYFLOWPRO(PayflowProGateway.class.getName()),
     BILLPRO(BillproGateway.class.getName()),
     EASYPAY(EasypayGateway.class.getName()),
-    CHECKOUT(CheckoutGateway.class.getName());
+    CHECKOUT(CheckoutGateway.class.getName()),
+    STRIPE(StripeGateway.class.getName());
 
     private final String paymentGateWayClassPath;
-    
+
     AvailableGateways(String classPath) {
         this.paymentGateWayClassPath = classPath;
     }
