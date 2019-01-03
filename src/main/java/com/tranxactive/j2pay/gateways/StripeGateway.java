@@ -110,7 +110,7 @@ public class StripeGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put("chargeId", responseObject.getString("id"))
-                    .put("amount", (int) (amount * 100))
+                    .put("amount", amount)
             );
 
             successResponse.setRefundParams(new JSONObject()
@@ -211,7 +211,7 @@ public class StripeGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put("chargeId", responseObject.getString("id"))
-                    .put("amount", (int) (amount * 100))
+                    .put("amount", amount)
             );
 
             successResponse.setCaptureParams(new JSONObject()
@@ -266,7 +266,7 @@ public class StripeGateway extends Gateway {
 
             successResponse.setVoidParams(new JSONObject()
                     .put("chargeId", responseObject.getString("id"))
-                    .put("amount", (int) (amount * 100))
+                    .put("amount", amount)
             );
 
             successResponse.setRefundParams(new JSONObject()
