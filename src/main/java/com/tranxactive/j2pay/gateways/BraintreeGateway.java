@@ -12,6 +12,19 @@ import com.braintreegateway.Environment;
 import com.braintreegateway.Result;
 import com.braintreegateway.Transaction;
 import com.braintreegateway.TransactionRequest;
+import com.braintreegateway.exceptions.AuthenticationException;
+import com.braintreegateway.exceptions.AuthorizationException;
+import com.braintreegateway.exceptions.ConfigurationException;
+import com.braintreegateway.exceptions.DownForMaintenanceException;
+import com.braintreegateway.exceptions.ForgedQueryStringException;
+import com.braintreegateway.exceptions.InvalidChallengeException;
+import com.braintreegateway.exceptions.InvalidSignatureException;
+import com.braintreegateway.exceptions.NotFoundException;
+import com.braintreegateway.exceptions.ServerException;
+import com.braintreegateway.exceptions.TimeoutException;
+import com.braintreegateway.exceptions.TooManyRequestsException;
+import com.braintreegateway.exceptions.UnexpectedException;
+import com.braintreegateway.exceptions.UpgradeRequiredException;
 import com.tranxactive.j2pay.gateways.core.Gateway;
 import com.tranxactive.j2pay.gateways.parameters.Currency;
 import com.tranxactive.j2pay.gateways.parameters.Customer;
@@ -54,6 +67,7 @@ public class BraintreeGateway extends Gateway {
 
     private HTTPResponse createCustomer(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
+        boolean hasException = false;
         CustomerRequest customerRequest = new CustomerRequest();
 
         customerRequest
@@ -77,11 +91,50 @@ public class BraintreeGateway extends Gateway {
                 .region(customer.getState())
                 .locality(customer.getCity());
 
-        Result<com.braintreegateway.Customer> createCustomer = getGatewayObject(apiParameters).customer().create(customerRequest);
+        Result<com.braintreegateway.Customer> createCustomer = null;
 
         GeneralResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
         HTTPResponse httpResponse = new HTTPResponse();
+
+        try {
+            createCustomer = getGatewayObject(apiParameters).customer().create(customerRequest);
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (createCustomer.isSuccess()) {
             successResponse = new GeneralResponse();
@@ -99,6 +152,7 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
+        boolean hasException = false;
         HTTPResponse createCustomer = createCustomer(apiParameters, customer, customerCard, currency, amount);
 
         if (!createCustomer.isSuccessful()) {
@@ -117,7 +171,46 @@ public class BraintreeGateway extends Gateway {
 
         transactionRequest.options().submitForSettlement(false);
 
-        Result<Transaction> sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        Result<Transaction> sale = null;
+
+        try {
+            sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (sale.isSuccess()) {
             successResponse = new AuthResponse();
@@ -150,14 +243,54 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse capture(JSONObject apiParameters, JSONObject captureParameters, float amount) {
 
+        boolean hasException = false;
         CaptureResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
         HTTPResponse httpResponse = new HTTPResponse();
 
-        Result<Transaction> capture = getGatewayObject(apiParameters).transaction().
-                submitForSettlement(
-                        captureParameters.getString(ParamList.TRANSACTION_ID.getName()),
-                        new BigDecimal(Float.toString(amount)));
+        Result<Transaction> capture = null;
+
+        try {
+            capture = getGatewayObject(apiParameters).transaction().
+                    submitForSettlement(
+                            captureParameters.getString(ParamList.TRANSACTION_ID.getName()),
+                            new BigDecimal(Float.toString(amount)));
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (capture.isSuccess()) {
             successResponse = new CaptureResponse();
@@ -185,6 +318,7 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
+        boolean hasException = false;
         HTTPResponse createCustomer = createCustomer(apiParameters, customer, customerCard, currency, amount);
 
         if (!createCustomer.isSuccessful()) {
@@ -203,7 +337,46 @@ public class BraintreeGateway extends Gateway {
 
         transactionRequest.options().submitForSettlement(true);
 
-        Result<Transaction> sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        Result<Transaction> sale = null;
+
+        try {
+            sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (sale.isSuccess()) {
             successResponse = new PurchaseResponse();
@@ -237,14 +410,54 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse refund(JSONObject apiParameters, JSONObject refundParameters, float amount) {
 
+        boolean hasException = false;
         RefundResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
         HTTPResponse httpResponse = new HTTPResponse();
 
-        Result<Transaction> refund = getGatewayObject(apiParameters).transaction().
-                refund(
-                        refundParameters.getString(ParamList.TRANSACTION_ID.getName()),
-                        new BigDecimal(Float.toString(amount)));
+        Result<Transaction> refund = null;
+
+        try {
+            refund = getGatewayObject(apiParameters).transaction().
+                    refund(
+                            refundParameters.getString(ParamList.TRANSACTION_ID.getName()),
+                            new BigDecimal(Float.toString(amount)));
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (refund.isSuccess()) {
             successResponse = new RefundResponse();
@@ -268,6 +481,8 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse rebill(JSONObject apiParameters, JSONObject rebillParameters, float amount) {
 
+        boolean hasException = false;
+
         RebillResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
         HTTPResponse httpResponse = new HTTPResponse();
@@ -279,7 +494,46 @@ public class BraintreeGateway extends Gateway {
 
         transactionRequest.options().submitForSettlement(true);
 
-        Result<Transaction> sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        Result<Transaction> sale = null;
+
+        try {
+            sale = getGatewayObject(apiParameters).transaction().sale(transactionRequest);
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
 
         if (sale.isSuccess()) {
             successResponse = new RebillResponse();
@@ -311,20 +565,60 @@ public class BraintreeGateway extends Gateway {
     @Override
     public HTTPResponse voidTransaction(JSONObject apiParameters, JSONObject voidParameters) {
 
+        boolean hasException = false;
         VoidResponse successResponse = null;
         ErrorResponse errorResponse = new ErrorResponse();
         HTTPResponse httpResponse = new HTTPResponse();
 
-        Result<Transaction> refund = getGatewayObject(apiParameters).transaction().
-                voidTransaction(voidParameters.getString(ParamList.TRANSACTION_ID.getName()));
+        Result<Transaction> voidTransaction = null;
 
-        if (refund.isSuccess()) {
+        try {
+            voidTransaction = getGatewayObject(apiParameters).transaction().
+                    voidTransaction(voidParameters.getString(ParamList.TRANSACTION_ID.getName()));
+        } catch (NotFoundException e) {
+            errorResponse.setMessage("No record found");
+            hasException = true;
+        } catch (AuthenticationException e) {
+            errorResponse.setMessage("Invalid credentials");
+            hasException = true;
+        } catch (AuthorizationException e) {
+            errorResponse.setMessage("Not authorized to perform this action");
+            hasException = true;
+        } catch (ConfigurationException e) {
+            errorResponse.setMessage("Configuratoin error");
+            hasException = true;
+        } catch (DownForMaintenanceException e) {
+            errorResponse.setMessage("Server is under maintenance");
+            hasException = true;
+        } catch (TimeoutException e) {
+            errorResponse.setMessage("Request time out");
+            hasException = true;
+        } catch (ForgedQueryStringException | InvalidChallengeException | InvalidSignatureException | UnexpectedException e) {
+            errorResponse.setMessage("Unexpected exception occured");
+            hasException = true;
+        } catch (ServerException e) {
+            errorResponse.setMessage("Server error");
+            hasException = true;
+        } catch (TooManyRequestsException e) {
+            errorResponse.setMessage("Too many requests");
+            hasException = true;
+        } catch (UpgradeRequiredException e) {
+            errorResponse.setMessage("Need to upgrade");
+            hasException = true;
+        }
+
+        if (hasException) {
+            processFinalResponse(null, httpResponse, successResponse, errorResponse);
+            return httpResponse;
+        }
+
+        if (voidTransaction.isSuccess()) {
             successResponse = new VoidResponse();
             successResponse.setMessage("Success");
-            successResponse.setTransactionId(refund.getTarget().getId());
+            successResponse.setTransactionId(voidTransaction.getTarget().getId());
 
         } else {
-            errorResponse.setMessage(refund.getMessage());
+            errorResponse.setMessage(voidTransaction.getMessage());
         }
 
         processFinalResponse(null, httpResponse, successResponse, errorResponse);
