@@ -19,6 +19,7 @@ import org.apache.http.entity.ContentType;
 import org.json.JSONObject;
 
 import static com.tranxactive.j2pay.gateways.util.ResponseProcessor.processFinalResponse;
+import static com.tranxactive.j2pay.gateways.util.UniqueCustomerIdGenerator.getUniqueVaultId;
 
 /**
  *
@@ -31,7 +32,8 @@ public class NMIGateway extends Gateway {
     @Override
     public HTTPResponse purchase(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        JSONObject requestObject = this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount);
+        String customerVaultId = getUniqueVaultId();
+        JSONObject requestObject = this.buildPurchaseParameters(apiParameters, customer, customerCard, currency, amount, customerVaultId);
         JSONObject responseObject;
         String requestString;
         String responseString;
@@ -61,7 +63,7 @@ public class NMIGateway extends Gateway {
             successResponse.setCurrencyCode(currency);
 
             successResponse.setRebillParams(new JSONObject()
-                    .put("customerVaultId", responseObject.get("customer_vault_id").toString())
+                    .put("customerVaultId", customerVaultId)
             );
 
             successResponse.setRefundParams(new JSONObject()
@@ -222,7 +224,8 @@ public class NMIGateway extends Gateway {
       @Override
     public HTTPResponse authorize(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
 
-        JSONObject requestObject = this.buildAuthorizeParameters(apiParameters, customer, customerCard, currency, amount);
+        String customerVaultId = getUniqueVaultId();
+        JSONObject requestObject = this.buildAuthorizeParameters(apiParameters, customer, customerCard, currency, amount, customerVaultId);
         JSONObject responseObject;
         String requestString;
         String responseString;
@@ -252,7 +255,7 @@ public class NMIGateway extends Gateway {
             successResponse.setCurrencyCode(currency);
 
             successResponse.setRebillParams(new JSONObject()
-                    .put("customerVaultId", responseObject.get("customer_vault_id").toString())
+                    .put("customerVaultId", customerVaultId)
             );
 
             successResponse.setVoidParams(new JSONObject()
@@ -353,7 +356,7 @@ public class NMIGateway extends Gateway {
     }
 
     //private methods are starting below.
-    private JSONObject buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+    private JSONObject buildPurchaseParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount, String customerVaultId) {
 
         JSONObject object = new JSONObject();
         object
@@ -375,7 +378,9 @@ public class NMIGateway extends Gateway {
                 .put("phone", customer.getPhoneNumber())
                 .put("email", customer.getEmail())
                 .put("ipaddress", customer.getIp())
-                .put("customer_vault", "add_customer");
+                .put("customer_vault", "add_customer")
+                .put("customer_vault_id", customerVaultId)
+                ;
 
         return object;
 
@@ -418,7 +423,7 @@ public class NMIGateway extends Gateway {
         return object;
     }
     
-    private JSONObject buildAuthorizeParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount) {
+    private JSONObject buildAuthorizeParameters(JSONObject apiParameters, Customer customer, CustomerCard customerCard, Currency currency, float amount, String customerVaultId) {
 
         JSONObject object = new JSONObject();
         object
@@ -440,7 +445,8 @@ public class NMIGateway extends Gateway {
                 .put("phone", customer.getPhoneNumber())
                 .put("email", customer.getEmail())
                 .put("ipaddress", customer.getIp())
-                .put("customer_vault", "add_customer");
+                .put("customer_vault", "add_customer")
+                .put("customer_vault_id", customerVaultId);
 
         return object;
 

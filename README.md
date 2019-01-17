@@ -1,6 +1,6 @@
 # J2Pay
 
-**version 2.9.10**
+**version 2.9.11**
 
 J2Pay is an open source multi-gateway payment processing library for Java. Which provides simple and generic api for many gateways. It reduces developers efforts of writing individual code for each gateway. It provides flexibility to write code once for all gateways. It also excludes the efforts of reading docs for individual gateways.
 
@@ -56,7 +56,7 @@ The following gateways are available.
 3 | PAYEEZY | x | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 4 | PAYFLOW PRO | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 5 | BillPro | ✓ | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/), [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-6 | EasyPay | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
+6 | EasyPay | ✓ | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai, [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 7 | Checkout | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 8 | Stripe | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 9 | Braintree | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
