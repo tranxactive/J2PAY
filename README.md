@@ -56,7 +56,7 @@ The following gateways are available.
 3 | PAYEEZY | x | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 4 | PAYFLOW PRO | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 5 | BillPro | ✓ | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/), [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
-6 | EasyPay | ✓ | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai, [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
+6 | EasyPay | ✓ | ✓ | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/), [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 7 | Checkout | ✓ | x | [Tousif Khan](https://www.linkedin.com/in/tousifhasanzai/)
 8 | Stripe | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
 9 | Braintree | ✓ | ✓ | [Muhammad Ilyas](https://www.linkedin.com/in/muhammad-ilyas-a4ab7839/)
