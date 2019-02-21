@@ -51,6 +51,7 @@ public class AuthResponse extends CoreResponse {
         this.cardFirst6 = cardFirst6;
         this.cardLast4 = cardLast4;
         this.maskedCard = maskedCard;
+        this.transactionId = transactionId;
         this.rebillParams = rebillParams;
         this.captureParams = captureParams;
         this.voidParams = voidParams;
