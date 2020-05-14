@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset
+      xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+            http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+<!-- created with Free Online Sitemap Generator www.xml-sitemaps.com -->
+
+
+<url>
+  <loc>http://j2pay.tranxactive.com/</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>1.00</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/index.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/getting-started.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/why.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/introduction.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/customer.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/customer_card.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/gateway.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/http_response.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/available_gateways.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/gateway_factory.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/api_responses.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/response_variables.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/sample_responses.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/example.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/implement_gateway.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+<url>
+  <loc>http://j2pay.tranxactive.com/supported_gateways.php</loc>
+  <lastmod>2018-12-28T10:06:08+00:00</lastmod>
+  <priority>0.80</priority>
+</url>
+
+
+</urlset>
