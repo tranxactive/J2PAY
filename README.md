@@ -45,7 +45,9 @@ for example.
 when a transaction is successfully processed some gateways return transaction id as transaction_id or transId or trans_tag blah blah.
 but if you are using J2pay you will always receive "transactionId".
 
-You can see J2Pay official documentation and contributors guide on [j2pay.tranxactive.com](http://j2pay.tranxactive.com/)
+## Documentaion
+
+You can find documention inside docs directory, documentation is build on php so you must host it.
 
 The following gateways are available.
 
